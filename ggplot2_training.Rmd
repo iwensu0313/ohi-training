@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r package, message = F}
 
+library(ggthemes)
 library(tidyverse)
 
 ```
@@ -77,7 +78,7 @@ m +
 
 ```
 
-## ggplot exercise: plot cty and hwy as scatterblot by car class and fuel type
+## ggplot exercise from [training doc][http://r4ds.had.co.nz/data-visualisation.html]: plot cty and hwy as scatterblot by car class and fuel type
 
 ```{r}
 
@@ -86,17 +87,20 @@ ggplot(data = mpg) +
 
 ```
 
+## specifying arguments outside of aes
+
 ```{r}
-
-ggplot(mpg, aes(displ,hwy))
-
 
 ggplot(data = mpg) +
   geom_point(aes(x = displ, y = hwy), color = "blue", alpha = 0.4) # when adding arguments outside of aes, it is applying color and transparency to the entire data set (e.g. make all points blue and transparency of 0.4)
 
 ```
 
-## More ggplot exercises from data visualization training doc (http://r4ds.had.co.nz/data-visualisation.html)
+## More ggplot exercises 
+
+From data visualization [training doc][http://r4ds.had.co.nz/data-visualisation.html]
+a. apply colour gradient
+b. distinguish between values < 5 and values > 5
 
 ```{r}
 
@@ -105,6 +109,141 @@ ggplot(data = mpg) +
 
 ggplot(data = mpg) +
   geom_point(aes(x = displ, y = hwy, colour = displ < 5)) # give color to all "displ" values < 5
+
+```
+
+## Faceting 
+
+```{r}
+
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy, color = class)) +
+  facet_wrap(~ manufacturer) # wrap this data by (~) 'manufacturer
+
+```
+
+## ggplot Themes
+
+See more customized themes by [Jeffrey Arnold][https://cran.r-project.org/web/packages/ggthemes/vignettes/ggthemes.html]. 
+
+```{r}
+
+theme <- ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy, color = class)) +
+  facet_wrap(~ manufacturer)
+
+theme +
+  theme_minimal()
+
+theme +
+  theme_wsj()
+
+```
+
+## Looking into other Geoms
+
+```{r}
+
+ggplot(mpg, aes(x = drv, y = hwy)) +
+  geom_jitter()
+
+ggplot(mpg, aes(x = drv, y = hwy)) +
+  geom_boxplot()
+
+ggplot(mpg, aes(x = drv, y = hwy)) +
+  geom_violin() # includes density per hwy value
+ 
+```
+
+```{r}
+
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy))
+
+ggplot(data = mpg) +
+  geom_smooth(aes(x = displ, y = hwy))
+
+# combine scatterplot and smoothing - graph it using two different geoms
+
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth()
+
+```
+
+```{r}
+
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = class)) + # only want class grouping (by color) to apply to points
+  geom_smooth()
+
+```
+
+### Exercise: Customizing my ggplot
+
+```{r}
+
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = class)) + # only want class grouping (by color) to apply to points
+  geom_smooth() +
+  theme_minimal() +
+  labs(title = "Relationship between Engline Size and Miles per Gallon", x = "Engine Displacement (litres)", y = "Highway (mpg)") +
+  scale_color_discrete(name = "Type of Car", labels = c("two-seater","compact","midsize","minivan","pickup","subcompact","suv")) +
+  theme(legend.position = "bottom")
+  
+
+```
+
+Bar charts
+
+```{r}
+
+bar <- ggplot(data = mpg) 
+
+bar +
+  geom_bar(aes(x = fl)) # default is to count number of observations in each bin or categorical value in 'fl'
+
+bar +
+  geom_bar(aes(x = fl, color = fl)) 
+
+bar +
+  geom_bar(aes(x = fl, fill = fl)) # since x and fill arguments are the same, it just fills it with a color
+
+bar +
+  geom_bar(aes(x = fl, fill = class)) # bins are from 'fl' and within each bin 'class' groupings are separated
+
+bar +
+  geom_bar(aes(x = fl, fill = class), position = "fill") # proportions of class within each bin is represesnted
+
+bar +
+  geom_bar(aes(x = fl, fill = class), position = "dodge") #align each 'class' group next to each other rather than stacking
+
+bar +
+  geom_bar(aes(x = fl, fill = class), position = "dodge") +
+  theme_minimal() +
+  scale_x_discrete(labels = c("CNG", "Diesel", "Ethanol", "Premium", "Regular")) +
+  labs(x = "Fuel Type", y = "Number of cars", title = "Here is my customized graph") +
+  scale_fill_brewer(palette = "PRGn")
+
+# see palettes that can be used in grouping values by color
+RColorBrewer::display.brewer.all()  
+
+``` 
+
+# Saving image
+
+```{r}
+
+myplot <- ggplot(data = mpg) +
+  geom_bar(aes(x = fl, fill = class), position = "dodge") +
+  theme_minimal() +
+  scale_x_discrete(labels = c("CNG", "Diesel", "Ethanol", "Premium", "Regular")) +
+  labs(x = "Fuel Type", y = "Number of cars", title = "Here is my customized graph") +
+  scale_fill_brewer(palette = "PRGn")
+
+ggsave("myplot.png", myplot, width = 6, height = 6)
+
+ggsave("myplot.pdf", myplot, width = 6, height = 6) # smaller file size
 
 ```
 
