@@ -1,0 +1,35 @@
+---
+title: "Exercises in R Markdown"
+author: "Iwen Su"
+date: "2/9/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## OHI Data Science Training
+
+### Training Exercise
+*This is my text in R Markdown*
+
+Here are the things I have learned today:
+
+1. There are extremely useful help documents and cheatsheets in R Studio
+2. `plot()` can plot many types of R objects
+
+
+### Training Notes
+
+* Use `echo = FALSE` when you don't want a code chunk to appear in your knitted document.
+* You can run example functions in the Help page directly with "command"+"return"
+    + Item 2a
+    + Item 2b
+    
+    
+[click here](http://ohi-science.org/data-science-training/rstudio.html#rmarkdown)
+
+
+> slkfjdsj
+> great

@@ -1,0 +1,110 @@
+---
+title: "ggplot2_training"
+author: "Iwen Su"
+date: "2/23/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load packages
+
+```{r package, message = F}
+
+library(tidyverse)
+
+```
+
+## Get mpg dataset
+
+```{r}
+
+mpg
+
+```
+
+## Plot data as scatterplot
+
+a. geom_point() - creates simple scatterplot
+
+```{r}
+
+ggplot(data = mpg, aes(x = displ, y = hwy)) + # how does mileage compare to engine size
+  geom_point()
+
+```
+
+## If creating multiple plots from same data
+
+```{r}
+
+# assign first line of ggplot() to a variable
+
+car_plot <- ggplot(data = mpg, aes(x = displ, y = hwy))
+
+# build off of car_plot - useful when trying to create different visualizations from the same base data
+
+car_plot +
+  geom_point()
+
+```
+
+## Adjust transparency of points in scatterplot
+
+```{r}
+
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point(alpha = 0.4) # adjusts transparency and reveals that there are multiple dots on the same coordinate point
+
+```
+
+## Group points using the class category by color or by shape
+
+```{r}
+
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy, color = class))
+
+m <- ggplot(data = mpg, aes(x = displ, y = hwy)) 
+
+m +
+  geom_point(aes(color = class))
+
+m +
+  geom_point(aes(shape = class)) # there are a limited number of shapes so 'suv' was not assigned a shape
+
+```
+
+## ggplot exercise: plot cty and hwy as scatterblot by car class and fuel type
+
+```{r}
+
+ggplot(data = mpg) +
+  geom_point(aes(x = cty, y = hwy, size = class, color = fl)) # group data 'class' by size, 'fl' by color
+
+```
+
+```{r}
+
+ggplot(mpg, aes(displ,hwy))
+
+
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy), color = "blue", alpha = 0.4) # when adding arguments outside of aes, it is applying color and transparency to the entire data set (e.g. make all points blue and transparency of 0.4)
+
+```
+
+## More ggplot exercises from data visualization training doc (http://r4ds.had.co.nz/data-visualisation.html)
+
+```{r}
+
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy, colour = cty)) # applying colour gradient to a continuous variable 'cty'
+
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy, colour = displ < 5)) # give color to all "displ" values < 5
+
+```
+

@@ -1,0 +1,49 @@
+---
+title: "Collaborating in Github"
+author: "Iwen Su"
+date: "2/16/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Notes from Training for GitHub Collaboration
+
+1. Partner 1 creates a new repository on github. Different branches are like parallel branches and can be merged at any future point in time. 
+
+2. Click on Branch: master
+
+3. In the blank, type in 'gh-pages' so that the repo is suitable for creating a website
+
+4. Change default branch and switch from master to gh-pages
+
+>In a master page an hmtl file will not render nicely. There is an extra step so instead just change the branch to gh-pages.
+
+5. Have the initial partner clone the repo to her own computer and commit the new changes that occurred.
+
+6. Go to settings to add a collaborator.
+
+## Dealing with merge conflicts 
+
+1. One partner commits a new change to line 7 and pushes
+
+2. Partner 2 makes a new change to line 7 as well before pulling 
+
+3. Partner 2 receives a message when pulling stating merge conflict. Commit her changes.
+
+4. Partner 2 receives a message when pulling again. Both partner's changes shows up in the file. Fix merge conflict manually in the script.
+
+5. Commit the fixed conflicts. Add message stating 'resolving merge conflits'
+
+6. Once committed push the updates.
+
+> revert can help remove every local change up until the last commit if you know your local changes are not as good as the other partner's changes.
+
+
+## Creating a website from scratch in R-GitHub
+
+Tips
+>Use a text document to create a yml site

@@ -1,0 +1,77 @@
+---
+title: "Data Science Training"
+author: "Iwen Su"
+date: "2/9/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Notes on R Studio**
+## Keyboard Shortcuts in RStudio
+'<-' operator: "OPTION"" + "-" (Mac)
+'<-' operator: "Alt" + "-" (Windows)
+For more info see Help < Keyboard Shortcuts Help
+
+## Checking Working Directory
+a. Click on arrow under Console
+b. Working directory specified under Console tab
+c. Or run getwd()
+
+## Giving Values to a Variable
+a. Checking value in your variable after saving it
+b. Testing 'True' or 'False' using ==, <, <=, etc
+c. Running arithmetic on variables (e.g. lb <- kg*2.2)
+d. RStudio predicts variables that have been saved so you prevent writing over the value in that variable
+e. Typo in variable - interpret error message. If not straightforward it is likely on Google
+
+## Help Page for Functions 
+a. ?function
+b. Arguments interpreted sequentially, shorthand
+c. Some arguments have defaults, usually later arguments in the sequence
+d. You can run example functions in the Help page directly with "command"+"return"
+e. If unsure what the function name is, use '??' before a word that you think is associated with a function
+f. Explore help functions a bit
+
+### Tips
+a. Adding parentheses around a variable you are giving a value to, it will print automatically. Try (x <- c(0:10,50))
+b. See all your objects in your environment with objects() or ls()
+c. Remove objects with rm(object). No parentheses needed.
+d. Can click on the broom icon to remove all objects as well. 
+
+## Exploring R Markdown
+a. Different language from R (R language is used inside code chunks). You can specify other languages like Python as well in the codes.
+b. Knit to html
+c. Cool thing about R Markdown v. R Studio is that you can see outputs displayed nicely in addition to code. You can also specify knit to not show a certain code chunk and just show the output (e.g. graph).
+d. You can add `echo = FALSE` parameter inside the {r } to prevent the code chunk from showing in the knitted markdown.
+e. Refer to Help > Markdown Quick Reference to view the rules for documenting and formatting markdown.
+
+
+# **Notes on GitHub**
+
+## Terminology
+a. What is version control? Save iterative versions of your file without having to rename it. All collaborators working in the file will know which is the most updated version.
+b. What is a repository? Essentially a unique project.
+
+## Testing in global-fellows-test repository (aka project)
+a. First tell R Studio your github crendentials by setting global parameters user.name and user.email 
+
+1. git config --global user.name iwensu0313
+2. git config --global user.email isu@bren.ucsb.edu
+3. git config --list 
+
+b. Clone remote repository on GitHub into a local 'github' folder.
+c. **Pull**. **Commit** the newly created files. **Pull** and **push**.
+d. Review where that push or recent update went on GitHub
+e. History of project in 'commits' (each version has its own code)
+f. Make local changes and try commit pull push again.
+g. Go back to GitHub to see the changes in the file.
+
+## About committing in GitHub
+a. If you're working on multiple different unrelated files, you can just select some files to commit first to apply a relevant commit message and then commit the other files after.
+b. Show that you can also add and modify folder organization in Windows Explorer or Mac Finder.
+
+
+
