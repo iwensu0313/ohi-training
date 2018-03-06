@@ -22,7 +22,7 @@ library(skimr)
 
 ```
 
-Get data from github.
+### Get data from github.
 
 ```{r data, message=FALSE}
 
@@ -30,7 +30,7 @@ gapminder <- readr::read_csv("https://raw.githubusercontent.com/OHI-Science/data
 
 ```
 
-Explore gapminder data.
+### Explore gapminder data.
 
 ```{r explore}
 
@@ -95,7 +95,7 @@ gap_cambodia2 <- select(gap_cambodia, -lifeExp, -continent)
 
 ```
 
-Life changing pipe operator `%>%` (and then)
+### Life changing pipe operator `%>%` (and then)
 
 ```{r}
 
@@ -121,11 +121,93 @@ gap_cambodia3 <- gapminder %>%
 
 ```
 
-To add variables use `mutate()`
+### To add variables use `mutate()`
+
+* You can run other functions inside the `mutate()` function
+* You can also run mathematical operations on existing columns
 
 ```{r}
+
+gapminder %>% 
+  mutate(index = 1:nrow(gapminder))
+
+gapminder %>% 
+  mutate(gdp = pop*gdpPercap) # can't call 'pop' or 'gdpPercap' by itself
+
+```
+
+### Exercise: Find the maximum gdpPercap of Egypt and Vietnam, and save it in a new column
+
+1. First filter for Egypt and Vietnam
+2. Then use `mutate` to create a new column that has the max GDP between Egypt and Vietnam together
+3. What if we want the max GDP of Egypt and max GDP of Vietnam separately? Use `group_by`
+
+```{r}
+
+# Find max GDP per capita of both Egypt and Vietnam
+gapminder %>% 
+  filter(country %in% c("Egypt","Vietnam")) %>% 
+  mutate(max_gdp = max(gdpPercap))
+
+# Find max GDP per capita of Egypt and Vietnam separately
+x2 <- gapminder %>% 
+  filter(country %in% c("Egypt","Vietnam")) %>% 
+  group_by(country) %>% 
+  mutate(max_gdp = max(gdpPercap)) %>% 
+  ungroup() # important to remember to ungroup
+
+str(x2)
+
+```
+
+### Summarize and `group_by` together
+
+While it can be nice to replicate the `max_gdp` value for each observation especially when you are running commands on all the observations, you may also want to just select the single value of max gdp for each country.
+
+> Note: 'CTRL+I' is the shortcut for reindenting lines.
+
+```{r}
+
+gapminder %>% 
+  group_by(country) %>% 
+  mutate(gdp = pop*gdpPercap) %>% 
+  summarize(max_gdp = max(gdp)) %>% 
+  ungroup() %>% 
+  arrange(max_gdp) # ascending order
+
+gapminder %>% 
+  group_by(country) %>% 
+  mutate(gdp = pop*gdpPercap) %>% 
+  summarize(max_gdp = max(gdp)) %>% 
+  ungroup() %>% 
+  arrange(desc(max_gdp)) # descending order
 
 
 
 ```
+
+Let's find the max lifeExp for countries in Asia
+
+```{r}
+
+# Grab max GDP for just countries in Asia
+asia <- gapminder %>% 
+  filter(continent == "Asia") %>% 
+  group_by(country) %>% 
+  mutate(gdp = pop*gdpPercap) %>% 
+  summarize(max_gdp = max(gdp)) %>% 
+  ungroup() %>% 
+  arrange(desc(max_gdp)) # descending order
+
+# Grab max life expectancy for countries in Asia
+gapminder %>% 
+  filter(continent == "Asia") %>% 
+  group_by(country) %>% 
+  summarize(max_gdp = max(lifeExp)) %>% 
+  ungroup() %>% 
+  dplyr::arrange(desc(max_gdp)) # descending order
+
+
+```
+
 
