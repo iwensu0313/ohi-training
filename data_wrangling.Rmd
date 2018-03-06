@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Intro to Data Wrangling
+
 ### Wrangle gapminder data using `dplyr`.
 
 First load the packages.
@@ -65,9 +66,62 @@ skim(gapminder$lifeExp)
 
 ```
 
-Dplyr basics: `filter()`, `select()`, `mutate()`, `summarise()`, and `arrange()`.
+### Dplyr basics: 
 
-[Cheatsheet](http://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+Main functions include: `filter()`, `select()`, `mutate()`, `summarise()`, and `arrange()`. See dplyr [cheatsheet](http://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf).
+
+```{r}
+
+filter(gapminder, lifeExp < 29)
+
+# Filter for 1 country
+filter(gapminder, country == "Mexico")
+
+# Filter for multiple countries - use the `%in%` operator on `c()`
+filter(gapminder, country %in% c("Mexico", "Chile"))
+
+# Filter for 1 country in a specific year
+filter(gapminder, country == "Mexico", year == 2002)
+
+# Select by columns
+select(gapminder, year, lifeExp)
+
+# Use the `-` to deselect columns
+select(gapminder, -continent, -lifeExp)
+
+# Use filter and select together
+gap_cambodia <- filter(gapminder, country == "Cambodia") 
+gap_cambodia2 <- select(gap_cambodia, -lifeExp, -continent)
+
+```
+
+Life changing pipe operator `%>%` (and then)
+
+```{r}
+
+gapminder %>% head() # equivalent to head(gapminder)
+
+gapminder %>% head(3) # equivalent to head(gapminder, 3)
+
+# Use filter and select together 
+gap_cambodia <- filter(gapminder, country == "Cambodia") 
+gap_cambodia2 <- select(gap_cambodia, -lifeExp, -continent)
+
+# now let's do that with the %>% operator
+gap_cambodia <- gapminder %>% 
+  filter(country == "Cambodia")
+
+gap_cambodia2 <- gap_cambodia %>% 
+  select(-lifeExp, -continent)
+
+# or you could combine the two variables created above by stacking `%>%` operators
+gap_cambodia3 <- gapminder %>% 
+  filter(country == "Cambodia") %>% 
+  select(-continent, -lifeExp)
+
+```
+
+To add variables use `mutate()`
 
 ```{r}
 
