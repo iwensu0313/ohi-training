@@ -247,3 +247,12 @@ ggsave("myplot.pdf", myplot, width = 6, height = 6) # smaller file size
 
 ```
 
+
+## Additional Exercises
+
+```{r}
+
+
+
+```
+

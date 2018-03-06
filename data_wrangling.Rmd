@@ -1,0 +1,77 @@
+---
+title: "Data Wrangling Training"
+author: "Iwen Su"
+date: "3/6/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Intro to Data Wrangling
+### Wrangle gapminder data using `dplyr`.
+
+First load the packages.
+
+```{r load, message=FALSE}
+
+library(tidyverse)
+library(skimr)
+
+```
+
+Get data from github.
+
+```{r data, message=FALSE}
+
+gapminder <- readr::read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/gapminder.csv")
+
+```
+
+Explore gapminder data.
+
+```{r explore}
+
+head(gapminder)
+tail(gapminder)
+
+head(gapminder, 10) # see the first ten rows
+tail(gapminder, 12) # see the last twelve rows
+
+## See structure and other info about the data frame
+str(gapminder)
+names(gapminder) 
+dim(gapminder) 
+c(nrow(gapminder), ncol(gapminder)) # create dim() from nrow() and ncol()
+
+## summary statistics
+summary(gapminder)
+skim(gapminder) 
+
+
+```
+
+> Note: In addition to what data.frames can store, tibble can store lists, ggplots, and multiple dataframes.
+
+Explore inside the dataframe `$`
+
+```{r}
+
+head(gapminder$lifeExp, 10)
+str(gapminder$lifeExp) # more useful function for looking at entire dataset
+summary(gapminder$lifeExp)
+skim(gapminder$lifeExp)
+
+```
+
+Dplyr basics: `filter()`, `select()`, `mutate()`, `summarise()`, and `arrange()`.
+
+[Cheatsheet](http://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+
+```{r}
+
+
+
+```
+
