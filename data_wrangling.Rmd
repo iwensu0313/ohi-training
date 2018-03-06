@@ -211,3 +211,41 @@ gapminder %>%
 ```
 
 
+### Joining Datasets
+
+Also referred to as relational data, because there is a relationship between two or more data tables. An example is that the same column header (variable) exists in both data tables.
+
+* You have to decide which data table you want to maintain the observations for, as they may share the same column header, but all the observations may not have match for each observation
+* `left_join` and `right_join` can be used to determine whether you want to maintain the integrity of data table on the left (first argument value) or on the right (second argument value) in the function
+* `inner_join` keeps only matched rows between both data tables
+* `full_join` retains all rows even if there are no matches
+
+```{r join}
+
+# Bring in second data table that will be joined with the `gapminder` dataset
+co2 <- read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/co2.csv")
+
+# explore
+co2 %>%
+  head()
+
+# Select for only 2007 data since co2 data is only from that year
+gap2007 <- gapminder %>% 
+  filter(year == 2007)
+
+# Left_join gap2007 to co2, by which column?
+lj <- left_join(gap2007, co2, by = "country")
+
+# Explore lj
+lj %>% dim()
+lj %>% summary()
+
+# Right_join gap2007 to co2, by which column?
+rj <- right_join(gap2007, co2, by = "country")
+
+# Explore rj
+rj %>% dim()
+rj %>% summary()
+
+```
+
