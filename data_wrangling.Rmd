@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Intro to Data Wrangling
+## Intro to Data Wrangling: `dplyr`
 
 ### Wrangle gapminder data using `dplyr`.
 
@@ -246,6 +246,169 @@ rj <- right_join(gap2007, co2, by = "country")
 # Explore rj
 rj %>% dim()
 rj %>% summary()
+
+```
+
+<br>
+<br>
+
+## Intro to Data Wrangling: `tidyr`
+
+Data wrangling with `tidyr`, which is part of the tidyverse. We are going to tidy some data!
+
+* `gather()`
+* `separate()`
+* `spread()`
+* `
+
+### Load `tidyverse`
+
+```{r message=FALSE}
+
+library(tidyverse) # install.packages("tidyverse")
+
+```
+
+### Read in gapminder dataset wide and long
+
+*ID variables* (key) are those that identify an observation such as continent, country or year.
+*Observation variables* (value) are values of the observation such as population, life expectancy and gdp per capita.
+
+```{r message=FALSE, results='hide'}
+
+# wide format
+gap_wide <- readr::read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/gapminder_wide.csv")
+
+## long format (intermediate)
+gapminder <- readr::read_csv('https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/gapminder.csv')
+
+```
+
+### Take a look
+
+```{r}
+
+head(gap_wide)
+str(gap_wide)
+
+```
+
+### Use `gather()` on the wide format data table
+Learned a new function `starts_with()`
+
+```{r}
+
+# attempt 1 - give names to new key-value columns
+gap_long <- gap_wide %>% 
+  gather(key = obstype_year,
+         value = obs_values)
+
+# unfortunately need to specify what you want the gather() function to gather
+str(gap_long)
+head(gap_long)
+tail(gap_long)
+
+# tell gather() which columns you want to apply it to
+gap_long <- gap_wide %>% 
+  gather(key = obstype_year,
+         value = obs_values,
+         dplyr::starts_with('pop'),
+         dplyr::starts_with('lifeExp'),
+         dplyr::starts_with('gdpPercap')
+         )
+
+str(gap_long)
+head(gap_long)
+tail(gap_long)
+
+# you can also use `-` to tell gather() which columns you want to exclude
+gap_long <- gap_wide %>% 
+  gather(key = obstype_year,
+         value = obs_values,
+         -continent, -country)
+
+str(gap_long)
+head(gap_long)
+tail(gap_long)
+
+```
+
+### Using `separate()` to turn one column into multiple columns
+
+```{r}
+
+gap_long <- gap_wide %>% 
+  gather(key = obstype_year,
+         value = obs_values,
+         -continent, -country) %>% 
+  separate(obstype_year,
+           into = c('obs_type', 'year'),
+           sep = "_",
+           convert = TRUE) # R converts values in new columns to what it think it should be (integer, numeric, or logical)
+
+# great, `year` column is of class integer
+str(gap_long)
+head(gap_long)
+tail(gap_long)
+
+```
+
+### Check it out in `ggplot`:
+Plot Canada's life expectancy
+
+```{r}
+
+canada_df <- gap_long %>% 
+  filter(obs_type == 'lifeExp',
+         country == 'Canada')
+
+ggplot(canada_df, aes(x = year, y = obs_values)) +
+  geom_line()
+
+```
+
+
+### Check it out in `ggplot`:
+Plot life expectancy in all countries in Americas
+
+```{r}
+
+life_df <- gap_long %>% 
+  filter(continent == "Americas", obs_type == "lifeExp")
+
+ggplot(life_df, aes(x = year, y = obs_values, color = country)) +
+  geom_line()
+
+```
+
+### Exercise
+
+Use `gap_long`:
+* calculate and plot the mean life expectancy for each continent over time from 1982 to 2007
+* give your plot a title and assign x and y labels
+
+```{r}
+
+life_all <- gap_long %>% 
+  filter(year >= 1982, obs_type == 'lifeExp') %>% 
+  group_by(continent, year) %>% 
+  summarize(meanLifeExp = mean(obs_values)) %>% 
+  ungroup()
+
+head(life_all)
+tail(life_all)
+
+ggplot(life_all, aes(x = year, y = meanLifeExp, color = continent)) +
+  geom_line() +
+  labs(x = "Year", 
+       y = "Mean Life Expectancy", 
+       title = "Mean Life Expectancy across Continents from 1982 to 2007" ) +
+  theme_classic()
+
+```
+
+
+```{r}
 
 ```
 
