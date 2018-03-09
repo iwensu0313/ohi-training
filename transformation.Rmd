@@ -150,6 +150,50 @@ flights %>%
 flights %>% 
   select(time_hour, air_time, everything())
 
+# Exercises
+flights %>% 
+  select(arr_time, arr_delay, dep_time, dep_delay)
+flights %>% 
+  select(dep_time:arr_delay, -sched_dep_time, -sched_arr_time)
+
+flights %>% 
+  select(dep_time, dep_time)
+
+# Unsure what `one_of` is supposed to do
+vars <- c("year", "month", "day", "dep_delay", "arr_delay")
+flights %>% 
+  select(one_of(vars))
+
+# default is to ignore case, but if you change value to FALSE then it is case-sensitive
+flights %>% 
+  select(contains("TIME", ignore.case = FALSE))
+
+
+```
+
+#### Add new variables with mutate()
+
+```{r}
+
+flights_sml <- flights %>% 
+  select(year:day, 
+         ends_with("delay"),
+         distance,
+         air_time)
+
+# create new columns with mutate and refer to newly created columns
+flights_sml %>% 
+  mutate(gain = arr_delay - dep_delay,
+         hours = air_time/60,
+         gain_per_hour = gain / hours
+         )
+
+# create new columns and remove the rest using `transmute`
+flights %>% 
+  transmute(gain = arr_delay - dep_delay,
+            hours = air_time / 60, 
+            gain_per_hour = gain/hours
+            )
 
 ```
 
