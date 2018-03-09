@@ -1,0 +1,170 @@
+---
+title: "Data Transformation Training"
+author: "Iwen Su"
+date: "3/8/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Intro to Data Transformation
+
+[R-4-DataScience][http://r4ds.had.co.nz/transform.html]
+
+### Load packages
+
+```{r}
+
+library(nycflights13) # install.packages("nycflights13")
+library(tidyverse)
+
+```
+
+### Grab data
+
+```{r}
+
+flights <- nycflights13::flights
+
+```
+
+### Key dplyr functions:
+
+`filter()`, `arrange()`, `select()`, `mutate()`, `summarize()`, & `group_by()`
+
+#### `filter()`
+
+```{r}
+
+# Using the `filter()` function
+# To print out results AND save to variable wrap with parentheses
+(jan1 <- flights %>% 
+  filter(month == 1, day == 1)
+)
+
+novdec <- flights %>% 
+  filter(month == 11 | month == 12)
+head(novdec)
+tail(novdec)
+
+nov_dec <- flights %>% 
+  filter(month %in% c(11,12))
+
+delay <- flights %>% 
+  filter(!(arr_delay > 120 | dep_delay >120))
+
+delay <- flights %>%  
+  filter(arr_delay <= 120, dep_delay <= 120)
+
+# using filter while preserving NA values
+df <- tibble(x = c(1,NA,3))
+df %>% 
+  filter(x > 1 | is.na(x))
+
+# Exercises
+flights %>% 
+  filter(arr_delay >= 2)
+flights %>% 
+  filter(dest %in% c("IAH","HOU"))
+flights %>% 
+  filter(carrier %in% c("UA","AA","DL"))
+flights %>% 
+  filter(month %in% c(7,8,9))
+flights %>% 
+  filter(dep_delay <= 0 & arr_delay > 2)
+flights %>% 
+  filter(dep_delay >= 1 & arr_delay <= -30)
+flights %>% 
+  filter(dep_time < 600 & dep_time > 000)
+
+# use shortcut `between()`!
+flights %>% 
+  filter(between(dep_time, 000, 600))
+
+
+```
+
+#### Using `arrange()`
+
+```{r}
+
+# first arrange by year then by month then by day
+flights %>% 
+  arrange(year, month, day)
+
+# arrange in descending order
+flights %>% 
+  arrange(desc(arr_delay)) %>% 
+  tail()
+
+# NA values get sorted to the end, always
+
+# Exercises
+# arrange NA values to the start
+flights %>% 
+  arrange(desc(is.na(dep_time)))
+
+# sort flights for most delayed flights
+flights %>%
+  arrange(desc(dep_delay))
+
+# sort flights for those that left the earliest
+flights %>%
+  arrange(dep_delay)
+
+# fastest flight
+flights %>% 
+  arrange(hour, minute)
+
+# shortest flight by distance was 17 miles, longest is 4983 miles
+flights %>% 
+  arrange(distance) %>% 
+  tail()
+
+```
+
+#### Selecting columns with `select()`
+
+Learning about helper functions!! `starts_with`, `ends_with`, `contains`, `matches`, `num_range`
+
+```{r}
+
+# different ways to select
+
+flights %>% 
+  select(year, month, day)
+
+flights %>% 
+  select(year:day)
+
+# all but year, month and day columns
+flights %>% 
+  select(-(year:day))
+
+flights %>% 
+  rename(tail_num = tailnum) # new column name = original column name
+
+# rearrange some columns to the front
+flights %>% 
+  select(time_hour, air_time, everything())
+
+
+```
+
+### Miscellaneous 
+
+```{r}
+
+# using near()
+near(sqrt(2)^2,2)
+near(1/49*49, 1)
+
+# using as.na() to ask if a value is missing
+x <- c(1,2,3,4,NA)
+is.na(x)
+
+```
+
+

@@ -408,7 +408,59 @@ ggplot(life_all, aes(x = year, y = meanLifeExp, color = continent)) +
 ```
 
 
+### Transform data from long to intermediate `spread()`
+
+key are the three observation types (pop, lifeExp, gdp)
+value are the values for each of those observations types
+
 ```{r}
+
+gap_normal <- gap_long %>% 
+  spread(obs_type, obs_values)
+
+# compare gap_normal to gapminder 
+dim(gap_normal)
+dim(gapminder)
+names(gap_normal)
+names(gapminder)
+
+```
+
+### Transform intermediate back to wide format
+
+Will need to use `unite()` the opposite of `separate()` to combine strings - combines multiple columns into one
+
+```{r}
+
+gap_wide2 <- gap_long %>% 
+  unite(obstype_year, obs_type, year, sep = "_", remove = T) %>% 
+  spread(obstype_year,obs_values)
+
+dim(gap_wide2)
+dim(gap_wide)
+names(gap_wide2)
+names(gap_wide)
+
+```
+
+### `complete()`
+
+```{r}
+
+kelpdf <- data.frame(
+  Year = c(1999, 2000, 2004, 1999, 2004),
+  Taxon = c("Saccharina", "Saccharina", "Saccharina", "Agarum", "Agarum"),
+  Abundance = c(4,5,2,1,8)
+)
+
+kelpdf
+
+kelpdf %>% 
+  complete(Year, Taxon)
+
+kelpdf %>% complete(Year = full_seq(Year, period = 1),
+                   Taxon,
+                   fill = list(Abundance = 0))
 
 ```
 
