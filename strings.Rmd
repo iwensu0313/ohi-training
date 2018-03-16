@@ -1,0 +1,77 @@
+---
+title: "Untitled"
+author: "Iwen Su"
+date: "3/16/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(stringr)
+
+```
+
+## Exploring the `stringr` functions
+
+```{r}
+
+# create vector of strings
+x <- c("why", "video", "cross", "extra", "deal", "authority")
+
+# gives the number of characters in each string in the vector
+str_length(x) 
+
+# combine the vector into a single string using `collapse` and indicating what string to insert between each string
+str_c(x, collapse = ", ")
+
+# only print out the first three letters of each string
+str_sub(x, 1, 3)
+# only print out the letters in each string from the second to the third letter
+str_sub(x, 2, 3)
+
+# subset the vector and only keep strings that contain vowels aeiou ("why" is removed)
+str_subset(x, "[aeiou]")
+# count the number of vowels in each string
+str_count(x, "[aeiou]")
+
+
+```
+
+## 7 Main Verbs that deal with Patterns
+
+```{r}
+
+## Here the pattern is "[aeiou]": presence of vowels
+
+# returns a TRUE/FALSE detection of the pattern
+str_detect(x, "[aeiou]")
+
+# count number of the pattern
+str_count(x, "[aeiou]")
+
+# extracts strings containing the pattern
+str_subset(x, "[aeiou]")
+
+# gives position of the match
+str_locate(x, "[aeiou]")
+
+# extracts the pattern in each string (only prints first match, not if there are multiple)
+str_extract(x, "[aeiou]")
+
+# extracts characters on either side of the vowel
+str_match(x, "(.)[aeiou](.)")
+
+# replaces the pattern with a diff string/text
+str_replace(x, "[aeiou]", "?")
+
+# splits up string into multiple pieces based on a specified string
+str_split(c("a,b", "c,d,e"), ",")
+str_split("hey-you-what-is-going-on","-")
+str_split("testabtestabhiabwhoab","ab")
+
+```
+
