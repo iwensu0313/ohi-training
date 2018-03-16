@@ -212,3 +212,72 @@ is.na(x)
 ```
 
 
+# LOOKS LIKE I LOST ALL THE PROGRESS AFTER MISCELLANEOUS ^ :(
+
+
+
+
+### 5.2.3 Missing values
+
+```{r}
+
+library(nycflights13)
+
+# create tibble with single column
+df <- tibble(x = c(1, NA, 3, NA), y = c(2, NA, 4, 6))
+
+# filtering with base R
+# filter(df, x > 1 | is.na(x))
+# filter with dplyr
+df %>% 
+  filter(is.na(x) | x > 1)
+df %>% 
+  filter(is.na(x), x > 1) # this won't work because you can't simultaneously be an NA value in the x column and greater than 1
+
+# both of these read: filter for values in column x that is greater than or equal to 1 AND the value in column y must simultaneously equal to 4
+df %>% 
+  filter(x >= 1, y == 4) 
+df %>% 
+  filter(x >= 1 & y == 4)
+
+# Filter for rows that don't have NAs in both x and y column
+df %>% 
+  filter(!(is.na(x) & is.na(y)))
+df %>% 
+  filter(!is.na(x) | !is.na(y)) # down for rows that don't have NAs in x or don't have NAs in y, but will grab rows where y has a value but x is an NA or vice versa
+
+# select rows where either x is greater than 1 or y is greater than 4
+df %>% 
+  filter(x > 1 | y > 4)
+df %>% 
+  filter(is.na(x) | is.na(y))
+
+
+
+# Both of these read: filter for rows where the arrive delay is less than or equal to 120 and the departure delay is less than or equal to 120. ???
+# any columns where arrival delay is greater than 120 even if depart delay is < 120 remove. any columns where departure delay is greater than 120 even if arrival delay is less than 120. remove!
+filter(flights, !(arr_delay > 120 | dep_delay > 120))
+filter(flights, arr_delay <= 120, dep_delay <= 120)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
