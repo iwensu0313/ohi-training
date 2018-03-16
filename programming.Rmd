@@ -1,0 +1,40 @@
+---
+title: "Chapter 8: Programming in R"
+author: "Iwen Su"
+date: "3/16/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Objectives 
+
+* create an R script
+* for loops
+* joining data
+* if statements
+
+### Analysis Plan
+Analysis with gapminder data: plot gdpPercap for each country.
+
+### Load Libraries
+
+```{r results='hide', message=FALSE, warning=FALSE}
+
+library(tidyverse)
+
+```
+
+### Read in Data
+
+```{r}
+
+gapminder <- readr::read_csv('https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/gapminder.csv')
+
+```
+
+>Sidenote: use `source("filename.R")` on an R script to run the entire script in that .R file
+
+
