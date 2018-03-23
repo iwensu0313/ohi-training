@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Intro to Strings"
 author: "Iwen Su"
 date: "3/16/2018"
 output: html_document
@@ -9,8 +9,11 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Load packages
+
 ```{r}
 
+library(tidyverse)
 library(stringr)
 
 ```
@@ -25,8 +28,11 @@ x <- c("why", "video", "cross", "extra", "deal", "authority")
 # gives the number of characters in each string in the vector
 str_length(x) 
 
-# combine the vector into a single string using `collapse` and indicating what string to insert between each string
+# combine the vector into a single string using `collapse` and indicating what string to insert between each string - default is collapse = ""
 str_c(x, collapse = ", ")
+str_c("why","you", sep = ", ") # does the same thing
+str_c(x, sep = ", ") # doesn't collapse into one string
+str_c(x, x, sep = ",") # collapses each [i]th of the first and second string argument 
 
 # only print out the first three letters of each string
 str_sub(x, 1, 3)
@@ -72,6 +78,151 @@ str_replace(x, "[aeiou]", "?")
 str_split(c("a,b", "c,d,e"), ",")
 str_split("hey-you-what-is-going-on","-")
 str_split("testabtestabhiabwhoab","ab")
+
+```
+
+## R 4 Data Science - Chapter 14: Strings
+
+```{r}
+
+# use \ to 'escape' a symbol and indicate it as part of the string
+double_quote <- "\"" # printed variable is not the string (includes escapes)
+backslash <- "\\" 
+
+writeLines(double_quote) # use this function to view string
+
+# see help page and all special characters: 
+?"`"
+
+# there is code for certain symbols
+x <- "\u00b5"
+writeLines(x)
+
+```
+
+## Exploring strings
+
+```{r}
+
+x <- c("abc", NA)
+str_c("|-", x, "-|")
+str_c("|-", str_replace_na(x), "-|")
+
+name <- "Hadley"
+time_of_day <- "morning"
+birthday <- FALSE
+
+str_c(
+  "Good ", time_of_day, " ", name,
+  if (birthday) " and HAPPY BIRTHDAY",
+  "."
+)
+
+```
+
+## Matching patterns
+
+```{r}
+
+x <- c("apple", "banana", "pear")
+str_view(x, "an")
+str_view(x, ".a.")
+
+# To create the regular expression, we need \\
+dot <- "\\."
+
+# But the expression itself only contains one:
+writeLines(dot)
+#> \.
+
+# And this tells R to look for an explicit .
+str_view(c("abc", "a.c", "bef"), "a\\.c")
+
+x <- "a\\b"
+writeLines(x)
+#> a\b
+
+str_view(x, "\\\\")
+
+```
+
+## Matching patterns: anchor to start or end
+
+* `^` to match start of string
+* `$` to match end of string
+
+```{r}
+
+x <- c("apple", "banana", "pear")
+str_view(x, "^a")
+str_view(x, "a$")
+
+x <- c("apple pie", "apple", "apple cake")
+str_view(x, "^apple$")
+
+```
+
+## Character classes and alternatives
+
+* `\d`: matches any digit.
+* `\s`: matches any whitespace (e.g. space, tab, newline).
+* `[abc]`: matches a, b, or c.
+* `[^abc]`: matches anything except a, b, or c.
+
+```{r}
+
+str_view(c("grey", "gray"), "gr(e|a)y")
+
+```
+
+## Detect matches
+
+* `str_detect()`
+* `str_count()`
+
+```{r}
+
+x <- c("apple", "banana", "pear")
+str_detect(x, "e")
+
+a <- "bad"
+b <- "bad"
+identical(a,b)
+
+str_subset(words, "x$")
+
+df <- tibble(
+  word = words, 
+  i = seq_along(word)
+)
+
+# filter for words that match "x$"
+df %>% 
+  filter(str_detect(words, "x$"))
+
+df %>% 
+  mutate(
+    vowels = str_count(word, "[aeiou]"),
+    consonants = str_count(word, "[^aeiou]")
+  )
+
+```
+
+## Match and extract 
+```{r}
+
+colours <- c("red", "orange", "yellow", "green", "blue", "purple")
+colour_match <- str_c(colours, collapse = "|")
+
+# subset for sentences with a color match
+has_colour <- str_subset(sentences, colour_match)
+
+# which colors matched? - only extracts first match
+matches <- str_extract(has_colour, colour_match)
+head(matches)
+
+more <- sentences[str_count(sentences, colour_match) > 1]
+str_extract_all(more, colour_match)
 
 ```
 
