@@ -1,0 +1,327 @@
+---
+title: "Spatial Training"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+# Introduction to Spatial in R
+
+Vector spatial data
+
+* `sp`/`rgdal` - closely linked packages, used when working with spatial files (e.g. read/write spatial data, transform coordinate system)
+* `regeos` - can merge polygons and use the buffer and intersect operations
+* `sf` - can treat spatial data as a data frame and use similar approaches to manipulating data; sometimes need to transform back to shapefile format but may eventually replace `sp` and `rgeos`; can't interact with rasters though - need to convert back to shapefile
+
+Raster spatial data
+
+* `raster` - primarily used for raster manipulation (read/write, manipulate, transform, analyze, modeling)
+* `fasterize` - converts vector data into a raster (similar to raster::rasterize, which is slower)
+* `rgdal` - used for projections
+
+[spatial R script for OHI](https://github.com/OHI-Science/ohiprep_v2018/blob/bccb633f6e147142e814eae4a84f81a572b2d369/src/R/spatial_common.R)
+[rspatial on twitter](https://twitter.com/hashtag/rspatial)
+[Jamie's spatial analysis tutorial](http://jafflerbach.github.io/spatial-analysis-R/)
+
+# Projections
+
+* Can't really preserve both direction and distance/area simultaneously (trade-offs!)
+* Lat/Long is considered unprojected data; most common for global data, but not great for very localized data (e.g. 1-m resolution)
+* Mollweide represents area more accurately; most common for OHI global assessments; direction not accurately represent, but not important for OHI; not commonly used in the general community (people might not be familiar)
+* Data must be in same projection: specify with epsg code or proj4string
+
+Vector spatial data
+
+* Retrieve projection - `proj4spring(x)`
+* Describe/define projection - `proj4spring(x) <- CRS("+init=epsg:28992")` OR `proj4spring(x) <- CRS("+proj=moll +ellps=WGS84")`
+* If need to transform from one CRS projection to another, can use `spTransform(x, CRS("..."))`
+
+Raster spatial data
+
+* Retrieve - `projection(x)`
+* Describe - `projection(x) <- CRS("...")`
+* Transform - `projectRaster()`
+
+
+# Exploring `sf`
+
+See [Jamie's training doc](https://rawgit.com/jafflerbach/spatial-analysis-R/gh-pages/intro_to_sf.html).
+
+## Load Packages
+```{r}
+
+# install.packages(c("sf","raster","rgdal"))
+# install.packages("fasterize")
+
+## load packages using library()
+library(tidyverse) #devtools::install_github("tidyverse/ggplot2") ## if most recent vers. not in CRAN
+library(sp)
+library(rgdal)
+library(sf)
+library(raster) # allows you to print out shapefiles with a more condensed summary rather than the full-length list; dplyr and raster may have conflicts
+library(fasterize)
+
+# select <- dplyr::select ## this code will force select() to be used from the dplyr package not raster package
+
+```
+
+## 1. Load shapefile using `rgdal`
+```{r}
+
+setwd("../spatial-analysis-R/")
+
+west_shp_rgdal <- rgdal::readOGR(dsn = "shapefiles", layer = "wc_regions")
+
+## Take a look in a plot
+plot(west_shp_rgdal)
+
+## Check the class of the object is SpatialPolygonsDataFrame
+west_shp_rgdal
+
+```
+
+## 2. Load shapefile using `sf`
+
+* Will print out some of the data table associated with the shapefile
+* With an sf object always subset for 1 column when plotting so R doesn't crash if it's huge
+```{r}
+
+setwd("../spatial-analysis-R/")
+west_shp_sf <- st_read(dsn = "shapefiles", layer = "wc_regions")
+west_shp_sf
+plot(west_shp_sf[1])
+nrow(west_shp_sf)
+
+```
+
+## `sf` and `dplyr`
+```{r}
+
+## remove a column using sf & dplyr
+west_shp_sf %>% 
+  dplyr::select(rgn, rgn_key) # geometry column is always preserved, but removes 'area_m2'
+
+## filter
+west_shp_sf %>% 
+  dplyr::filter(rgn == "Oregon")
+
+## Create new two new columns with mutate
+sf_out <- west_shp_sf %>% 
+  mutate(rgn_id = c(1:5),
+         area_km2 = area_m2/1000000)
+
+```
+
+## Transform spatial data in `sf`
+
+* Currently sf_out is in lat/long format
+* Let's reproject sf_out to Mollweid
+```{r}
+
+sf_trans <- st_transform(sf_out, crs = "+proj=moll +ellps=WGS84")
+plot(sf_trans[1])
+
+```
+
+## Save simple feature
+```{r}
+
+setwd("../spatial-analysis-R/")
+st_write(sf_out, "shapefiles/wc_regions_clean.shp", driver = "ESRI Shapefile", delete_layer = TRUE) # delete_layer lets you overwrite the file if it already exists and replace it
+
+```
+
+## Visualize with ggplot
+```{r}
+
+ggplot(sf_out) +
+  geom_sf()
+
+## Plot and fill with a discrete variable
+ggplot(sf_out) +
+  geom_sf(aes(fill = rgn)) + # rgn is discrete variable
+  theme_minimal() +
+  labs(fill = "Region") + # this changes the legend title to "Region"
+  scale_fill_brewer(palette = "Spectral")
+
+## Plot and fill with a continuous variable
+ggplot(sf_out) +
+  geom_sf(aes(fill = area_km2)) + # area is continuous variable 
+  theme_bw() +
+  labs(fill = "Area (km2)") +
+  scale_fill_distiller(palette = "Blues", direction=1) #direction can be used to reverse the color palette scale; try changing value to '-1"
+
+```
+
+## Manipulate shapefiles
+
+Use `st_union` to merge all polygons
+```{r}
+
+## Merge all polygons (it'll convert from sf class to sfc - no longer a data frame)
+full_rgn <- st_union(sf_out)
+plot(full_rgn[1])
+class(full_rgn) # it is now class sfc which can't be plotted in ggplot
+
+## Convert full_rgn back to an sf object using st_sf
+full_rgn <- st_union(sf_out) %>%
+            st_sf(geometry = .) # the "." calls the object that was created last, st_union(sf_out)
+
+class(full_rgn) # now it's class sf and data.frame, which allows you to manipulate it with tidyverse tools
+
+ ggplot(full_rgn) +
+   geom_sf()
+ 
+```
+
+
+# Exploring `raster`
+
+## Import data
+```{r}
+
+## west coast regions shapefile and take a look at it
+wc_rgns <- st_read(dsn = "shapefiles", layer = "wc_regions_clean")
+plot(wc_rgns[1])
+
+## read in a raster
+r <- raster("rasters/average_annual_sst_2008.tif")
+plot(r)
+
+## Take a look at raster data with histogram
+hist(r)
+
+```
+
+## Combine & manipulate all rasters
+```{r}
+
+## Read in all of the sst raster layers and put them into a stack
+sst_files <- list.files("rasters", pattern = "average_", full.names=T)
+
+sstStack <- stack(sst_files)
+plot(sstStack)
+
+## Get the average SST in Celcius
+## function averages SST and converts to C
+myFUN <- function(x){
+  mean(x, na.rm=T)-273.15
+  }
+
+sst_avg <- raster::calc(sstStack, fun=myFUN, filename = "rasters/sst_avg.tif") # calculates avg and saved to a file (good for large data)
+plot(sst_avg)
+```
+
+## Import in NPP raster
+```{r}
+
+## Net primary productivity
+npp <- raster("rasters/annual_npp.tif")
+plot(npp)
+
+## Some exploration tools you can use
+#zoom(npp)
+#cropped <- zoom(npp)
+#click(npp)
+```
+
+```{r}
+## Transform into same projection as SST data
+nppProj <- raster::projectRaster(npp, crs = ("+proj=longlat"))
+# nppProj <- raster::projectRaster(npp, crs = crs(sst_avg)) # other way to transform
+plot(nppProj)
+plot(wc_rgns, add = T) # add wc_rgns to the current plot
+
+## Crop nppProj to sst_avg bounding coordinates
+nppCrop <- raster::crop(nppProj, sst_avg)
+plot(nppCrop)
+plot(wc_rgns, add=T)
+
+## Resample - divide one cell into multiple cell
+npp_res <- raster::resample(nppCrop, sst_avg, method = "ngb") # nearest neighbor - keep data as close to raw data as possible (no new data is created)
+npp_bil <- raster::resample(nppCrop, sst_avg, method = "bilinear") # tries to smooth across cells, averaging between original cells
+
+## plot two figures next to each other
+par(mfrow = c(1,2))
+plot(npp_res); plot(npp_bil)
+
+dev.off() # removes the par() setting
+
+## Try using pipes to do it all together
+npp_res <- npp %>%
+  raster::projectRaster(crs = ("+proj=longlat")) %>% 
+  raster::crop(sst_avg) %>% 
+  raster::resample(sst_avg, method = "ngb", progress = "text") # progress gives you a progress bar while you're running the code
+
+plot(npp_res)  
+
+stack(npp_res, sst_avg)
+
+## Reclassify values into 0 or 1 to indicate suitability for aquaculture 
+## Optimal temp is between 12 and 18 C
+sstPref <- reclassify(sst_avg, c(-Inf, 12, NA, # all cells between -Inf and 12, turn it into NA
+                                12, 18, 1, # all cells between 12 and 18, turn it into 0
+                                18, Inf, NA)) # all cells between 18 and inf, turn it into NA
+
+plot(sstPref)
+
+## Reclassify NPP
+## NPP constraints between 2.6 and 3
+
+nppPref <- reclassify(npp_res, c(-Inf, 2.6, NA,
+                                 2.6, 3, 1,
+                                 3, Inf, NA))
+
+plot(nppPref)
+
+## Combine rasters using overlay() function
+## Specify how you want R to overlay the raster. Here we want desirable cells to have a value of 1
+cells <- raster::overlay(sstPref, nppPref, fun=function(x,y){x*y})
+plot(cells, col="lightblue")
+
+## Mask - remove all cells that fall outside the US EEZ
+cellsEEZ <- mask(cells, wc_rgns) # removes parts of cells that lies outside of wc_rgns
+plot(cellsEEZ)
+
+## Rasterize wc_rgns (convert from simple features to raster)
+wc_rgns # print to see the data table (it's a sf so you can see this info, once rasterized you can't)
+wcZones <- fasterize(wc_rgns, cellsEEZ, field = "rgn_id") # cellsEEZ used as a raster template for the raster output of wc_rgns
+plot(wcZones)
+
+## Zonal stats
+suit_area <- raster::zonal(cellsEEZ, wcZones, fun = "sum") # wcZones is the raster with codes for the 5 zones, add up the values in cellsEEZ 
+suit_area # adds up cells in each zone (e.g. Washington)
+
+```
+
+## Additional Visualizing and Calcs
+```{r}
+
+## Plot the suitable aquaculture areas and US west coast zones next to each other
+par(mfrow = c(1, 2))
+plot(cellsEEZ, col='lightblue', main='Suitable Aquaculture Areas');plot(wcZones, main='US West Coast zones')
+
+## Create a new raster with area values in the data
+cellsArea = area(cellsEEZ, na.rm=T)
+plot(cellsArea, main='Cell area (km2)') 
+
+```
+
+
+```{r}
+sf_trans <- st_transform(sf_out, crs = "+proj=moll +ellps=WGS84")
+wcZones
+projection(wcZones) <- CRS("+proj=moll +ellps=WGS84")
+wcZones
+plot(wcZones)
+sf_trans
+plot(sf_trans)
+
+new <- fasterize(sf_trans, wcZones, field = "rgn_id")
+plot(new)
+
+```
+
+
+
