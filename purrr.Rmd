@@ -61,7 +61,10 @@ mean(mtcars$cyl)
 ## Pasting two vectors
 a <- map2_chr(c('one','two','red','blue'), c('fish'), paste); a
 b <- map2(c('one','two','red','blue'), c('fish'), paste); b
-class(a); class(
+
+fish_colors <- list(c('one','two','red','blue'), c('fish'))
+pmap_chr(fish_colors,paste)
+class(a)
 
 ## Specify exactly how you want to paste the two vectors together
 ## I think the squiggly indicates you are linking to the first and second argument, w/o it doesn't work
@@ -73,35 +76,40 @@ map2_chr(c('one','two','red','blue'), c('fish'), paste(.x,.y))
 
 ## Perks of `purrr::map`
 
-The cool thing that `purrr` offers is you don't have to `rbind`, `cbind`, or `join` your dataframes into one before passing a function over it as in `lapply`.
+The cool thing that `purrr` offers is you don't have to `rbind`, `cbind`, or `join` your dataframes into one before passing a function over it as in `lapply`, where you only get to specify a function over a single vector or list.
 
 ```{r} lapply(X, FUN..)```, where X is a vector or list
 
-Let's try with the `got_chars` data.
+### Let's try with the `got_chars` data.
 
+* Can specific a character vector of names or a numeric vector of position - only these will be modified
+* `got_list` only prints out the 4 elements named above
+* In this method, you still preserve the entire list of 30, pulling out the 4 elements of interest
 ```{r}
 
-## Can specific a character vector of names or a numeric vector of position - only these will be modified
-## got_list only prints out the 4 elements named above
-## In this method, you still preserve the entire list of 30, pulling out the 4 elements of interest
-got_list <- got_chars %>%
+got_list_test <- got_chars %>%
   map(`[`, c('name','aliases','allegiances','born'))
 str(got_list, list.len=4)
+```
 
-
-
-## You can rearrange and group same elements into lists
-## The `got_chars` list contains 30 lists
+You can rearrange and group same elements into lists. The `got_chars` list contains 30 lists
+```{r}
 View(got_chars)
 length(got_chars)
-## Create list for each element from the 30 lists in got_chars
-map_chr(got_chars,'name')
+```
+
+
+### Create list for each element from the 30 lists in got_chars
+```{r}
+k <- map_chr(got_chars,'name')
 map(got_chars,'aliases')
 map(got_chars,'allegiances')
 map_chr(got_chars,'born')
+```
 
-## Create a list for each of the 4 elements
-got_list2 <-  got_chars %>% {
+Create a list for each of the 4 elements - group them together
+```{r}
+got_list <-  got_chars %>% {
   list(
     name = map_chr(.,'name'),
     aliases = map(.,'aliases'),
@@ -111,8 +119,42 @@ got_list2 <-  got_chars %>% {
 }
 
 ## Take a look at list structure, 4 lists
-str(got_list2, list.len=2)
+str(got_list, list.len=4)
 
+
+```
+
+
+Paste the name, aliase, allegiance, and birth information together across the lists. `got_list2[["name"]][1]` matches with `got_list2[["aliases"]][1]`, `got_list2[["allegiances"]][1]` and `got_list2[["born"]][1]`
+```{r}
+
+## Create function for getting name,  number of aliases, number of allegiances, and the born information
+got_foo <- function(name, aliases, allegiances,born){
+
+  paste(name, 'has', length(aliases), 'aliases and', length(allegiances),
+        'allegiances, and was born in', born)
+
+}
+
+got_list %>%
+  pmap_chr(got_foo) %>%
+  head()
+
+
+## This doesn't work because got_list contains more than 2 lists
+got_list %>%
+  map_chr(got_foo) %>%
+  head()
+
+```
+
+`purrr` functions to view different parts of a list
+
+```{r}
+str(got_list, list.len=4)
+
+## you can just grab the allegiances, but this will turn it back into a list of 30; each allegiance you pluck becomes a list
+allegiances <- pluck(got_list,"allegiances"); View(allegiances)
 ```
 
 
@@ -120,11 +162,7 @@ str(got_list2, list.len=2)
 
 
 
-
-
-
-
-
+***
 
 
 
@@ -137,9 +175,10 @@ str(got_list2, list.len=2)
 Unlike `lapply`, do not need to specify a function to select for each
 ```{r}
 
-lapply(got_chars[1:3], function(x) x[["name"]])
+lapply(got_chars[1:3], 
+       function(x) x[["name"]])
 
-map(got_chars[1:3], "name")
+map(got_chars[1], "name")
 
 ## View b again
 b
@@ -148,14 +187,9 @@ names(b) <- c("A","B","C","D")
 ## Create a list that contains three lists
 b_list <- list(b,b,b)
 ## Select for element A in all three lists
-map(b_list[1:3],"A")
-
+map(b_list[1:2],"A")
+map(b[1],"A")
 ```
-
-
-
-
-
 
 
 ## Apply linear regression model for each country using `group_by`
