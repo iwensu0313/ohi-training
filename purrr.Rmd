@@ -159,49 +159,31 @@ allegiances <- pluck(got_list,"allegiances"); View(allegiances)
 
 
 
+# Functional Programming
 
+## Resources
+[R for Data Science](http://r4ds.had.co.nz/lists.html)
+[Jenny B](https://jennybc.github.io/purrr-tutorial/ls03_map-function-syntax.html)
 
+## One-sided Formula
 
-***
+The '.' specifies the last data frame that was created.
 
-
-
-
-
-
-
-## Subset for an item across multiple lists
-
-Unlike `lapply`, do not need to specify a function to select for each
+Example:
 ```{r}
-
-lapply(got_chars[1:3], 
-       function(x) x[["name"]])
-
-map(got_chars[1], "name")
-
-## View b again
-b
-## Name the elements in the list
-names(b) <- c("A","B","C","D")
-## Create a list that contains three lists
-b_list <- list(b,b,b)
-## Select for element A in all three lists
-map(b_list[1:2],"A")
-map(b[1],"A")
+models <- mtcars %>% 
+  split(.$cyl) %>% 
+  map(~lm(mpg ~ wt, data = .))
 ```
 
-
-## Apply linear regression model for each country using `group_by`
-
+So the long-hand version of what is happening in `split()`
 ```{r}
-d_gf <- d %>%
-  dplyr::group_by(country) %>%
-  dplyr::do({ 
-    mod <- lm(value ~ year, data =.)
-    value_pred <- predict(mod, newdata =.[c('year')]) # value_pred = country-grouped mod$fitted.values?
-    data.frame(., value_pred) # do loop applies the model fitting and prediction to each country group
-    }) %>% 
-  dplyr::ungroup()
+split(mtcars$cyl)
 ```
+
+and `map()`
+```{r}
+map(~lm(mpg ~ wt, data = split(mtcars$cyl)))
+```
+
 

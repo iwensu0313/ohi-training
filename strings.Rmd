@@ -226,3 +226,27 @@ str_extract_all(more, colour_match)
 
 ```
 
+***
+
+# Common String/RegEX Uses in OHI
+
+## Extract date or number string
+
+```{r}
+source('https://rawgit.com/OHI-Science/ohiprep_v2018/master/src/R/common.R')
+file <- "/home/shares/ohi/git-annex/globalprep/prs_fish/v2018/int/comm_landings/annual_catch_1999.tif"
+str_extract(basename(file),"(\\d)+") # extracts any digits
+
+```
+
+## Extract using start and "end" pattern
+* Extract string where 'Japan' is at the very end
+* Extract string where 'Japan' just comes after some string following 'Walleye pollock'
+```{r}
+
+RAM <- read.csv("https://rawgit.com/OHI-Science/ohiprep_v2018/master/globalprep/fis/v2018/int/RAM_fao_ohi_rgns.csv")
+RAM[which(str_detect(RAM$stocklong, paste(c("^Walleye pollock.*Japan"), collapse = "|"))),]
+RAM[which(str_detect(RAM$stocklong, paste(c("^Walleye pollock.*Japan$"), collapse = "|"))),]
+
+```
+
