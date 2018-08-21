@@ -1,0 +1,164 @@
+---
+title: "Seaside Chat 8/20"
+author: "Iwen Su"
+output: html_document
+---
+
+
+# Common String/RegEX Uses in OHI
+
+## OHI Ex: Extract date or number string
+
+1. Setup
+```{r}
+library(raster)
+library(sp)
+library(stringr)
+
+source('https://rawgit.com/OHI-Science/ohiprep_v2018/master/src/R/common.R')
+npp_files_gf <- list.files(file.path(dir_M,"git-annex/globalprep/prs_fish/v2018/VGPM_primary_productivity/int/annual_npp"), full.names=TRUE, pattern = "gf")
+```
+
+2. Extract string of digits - useful in OHI when matching up the data year for different data
+```{r}
+
+file <- "/home/shares/ohi/git-annex/globalprep/prs_fish/v2018/int/comm_landings/annual_catch_2003.tif"
+str_extract(basename(file),"(\\d)+") # extracts any digits
+
+
+catch_npp_fun <- function(file, layer){
+  
+  catch <- raster(file)
+  base <- basename(file)
+  
+  #base <- "annual_2000_2003"
+  #base <- "annual_20002003"
+  
+  yr <- str_extract(base,"(\\d)+") # extracts the first consecutive digit string
+  
+  # Grab the NPP raster from the same year
+  npp <- npp_files_gf[str_detect(npp_files_gf, yr)] %>% 
+    raster()
+
+  # Resample and project
+  projectRaster(catch, npp, method = 'ngb', over=TRUE, filename = file.path(dir_M,"git-annex/globalprep/prs_fish/v2018/tmp/temp_resample2-1.tif"), overwrite=TRUE) 
+  catch_resmp <- raster(file.path(dir_M,"git-annex/globalprep/prs_fish/v2018/tmp/temp_resample2-1.tif"))
+    
+  
+  
+  # Divide Catch rasters by NPP rasters
+  overlay(catch_resmp, npp, fun=function(x,y){x/y}, filename = file.path(dir_M,
+                                                                         sprintf("git-annex/globalprep/prs_fish/v2018/int/%s/annual_catch_corr_%s.tif",layer,yr)
+                                                                         
+                                                                         ), overwrite=TRUE)
+  
+}
+
+## Specify name of layer
+lapply(comm_land, catch_npp_fun, layer = 'comm_landings')
+
+```
+
+## Extract using start and "end" pattern
+* Extract string where 'Japan' is at the very end
+* Extract string where 'Japan' just comes after some string following 'Walleye pollock'
+```{r}
+
+RAM <- read.csv("https://rawgit.com/OHI-Science/ohiprep_v2018/master/globalprep/fis/v2018/int/RAM_fao_ohi_rgns.csv")
+RAM[which(
+  
+  str_detect(RAM$stocklong, "^Walleye pollock.*Japan")
+  
+  ),]
+
+RAM[which(str_detect(RAM$stocklong, paste(c("^Walleye pollock.*Japan$"), collapse = "|"))),]
+
+```
+
+
+# Case When Example
+
+1. Setup
+
+```{r}
+
+library(dplyr)
+
+```
+
+```{r}
+
+RAM_rgns_new <- read.csv("globalprep/fis/v2018/int/RAM_fao_ohi_rgns.csv")
+
+RAM_filt <- RAM_rgns_new %>% 
+  filter(is.na(fao_id)) %>% 
+  select(-RAM_area_m2)
+
+
+RAM_ifelse <- RAM_filt %>%
+  ## Adding FAO region id
+  mutate(fao_id  = 
+           ifelse(str_detect(stocklong, paste(c("Bering Sea","Gulf of Alaska$"), collapse = "|")), 61, 
+                  ifelse(str_detect(stocklong, "Sicily$"), 37,
+                         ifelse(str_detect(stocklong, paste(c("^Jackass morwong Western","^Jackass morwong Eastern","Redfish Eastern Australia","Blue grenadier New South Wales"), collapse = "|")), 57, NA)))) %>% 
+  
+  mutate(fao_id_2  = 
+           ifelse(str_detect(stocklong, "Bering Sea"), 67, 
+                  ifelse(str_detect(stocklong,  paste(c("^Jackass morwong Eastern","Redfish Eastern Australia","Blue grenadier New South Wales"), collapse = "|")), 81,NA))) %>% 
+  
+  ## Adding OHI region id
+  mutate(rgn_id  = 
+           ifelse(str_detect(stocklong, paste(c("Bering Sea","Gulf of Alaska$"), collapse = "|")), 163,
+                  ifelse(str_detect(stocklong, "Sicily$"), 184,
+                         ifelse(str_detect(stocklong, "Australia$"), 16, NA))))
+
+DT::datatable(RAM_ifelse,rownames = F)
+
+```
+
+* Don't have to worry about counting number of nested parentheses - just need the `mutate` and `case_when` closing parentheses.
+* More organized alignment
+* Automatic if case doesn't match then doesn't do anything
+```{r}
+
+RAM_case <- RAM_filt %>% 
+  ## ADDING FAO REGION ID
+  mutate(fao_id = 
+           case_when(
+             
+             str_detect(stocklong, paste(c("Bering Sea","Gulf of Alaska$"), collapse = "|")) ~ 61,
+             str_detect(stocklong, "Sicily$") ~ 37,
+             str_detect(stocklong, paste(c("^Jackass morwong Western","^Jackass morwong Eastern","Redfish Eastern Australia","Blue grenadier New South Wales"), collapse = "|")) ~ 57
+             
+             )) %>% 
+  
+  mutate(fao_id_2 =
+           case_when(
+             str_detect(stocklong, "Bering Sea") ~ 67,
+             str_detect(stocklong,  paste(c("^Jackass morwong Eastern","Redfish Eastern Australia","Blue grenadier New South Wales"), collapse = "|")) ~ 81
+             )) %>% 
+  
+  ## ADDING OHI REGION ID
+  mutate(rgn_id = 
+           case_when(
+             
+             str_detect(stocklong, paste(c("Bering Sea","Gulf of Alaska$"), collapse = "|")) ~ 163,
+             str_detect(stocklong, "Sicily$") ~ 184,
+             str_detect(stocklong, "Australia$") ~ 16
+             
+           )) 
+  
+
+DT::datatable(RAM_case,rownames = F)
+
+```
+
+Compare - check differences
+
+```{r}
+
+setdiff(RAM_case, RAM_ifelse)
+setdiff(RAM_ifelse, RAM_case)
+
+```
+
