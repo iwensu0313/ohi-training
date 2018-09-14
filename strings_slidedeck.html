@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Introduction to Shiny Modules</title>
+    <title>OHI String Applications</title>
     <meta charset="utf-8">
     <meta name="author" content="du.iwensu@gmail.com" />
     <meta name="date" content="2018-01-01" />
@@ -12,501 +12,372 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Introduction to Shiny Modules
+# OHI String Applications
 ### <a href="mailto:du.iwensu@gmail.com">du.iwensu@gmail.com</a>
 ### 2018
 
 ---
 
 
-background-image: url(img/fish-background.jpg)
-background-size: cover
 
 
 
----
 name: toc
 
 # Table of Contents
 
-1. [Intro to the Global Dashboard](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#intro)
-2. [Structure of Repository](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#structure)
-3. [The 3 Shiny Modules](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#modules)
-4. [Sneak Peak: User Interface](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#ui)
-5. [Sneak Peak: Server](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#server)
-6. [Add a new goal section to the sidebar](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#sidebar)
-7. [Add header content for an OHI goal](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#header)
-8. [Add summary statistics](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#stats)
-9. [Add a global map](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#map)
-10. [Add a plot](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#chart)
+1. [Extracting date or number](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#date)
+2. [Extract using start and end pattern](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#start_end)
+3. [Extract string with `grep`](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#grep)
+4. [Select string in a file path based on position](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#posit)
+5. [Select files in a list of files matching a given year](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#year)
+6. [Extracting string using `starts_with`](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#start_with)
+7. [Remove string from column names](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#column_name)
+8. [Manipulate column with `ifelse`, `str_detect`, and `toupper`](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#ifelse)
+9. [Conditional Selection Based on String in File Name](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#condition)
+10. [Removing weird symbols in species names](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#symbols)
 
 ---
-name: intro
-class: middle, center
+name: date
 
-# Intro to the Global Dashboard
+## Extracting date or number
+Function: `str_extract`, RegEx: `(\\d)+`
 
----
-
-## How to Use this Slide Deck
-
-The global dashboard was created to provide OHI Global users a way to explore the data that went into calculating each of the 10 goals. 
-
-I am not going to teach you `shiny`. You can do that on your own time. What I will do is walk you through how to add a new goal section to the global dashboard. 
-
-There are short videos at the end of each section that summarize the content if you'd rather not read.
-
-**Feel free to skip to any of the sections 6 through 10 if you are good at hacking your way through R and know what you're trying to do.**
-
----
-
-## Main components you'll be customizing
-
-The **UI** (`ui.R`) and **server** (`server.R`) are best friends and without telling them both that you want to create something, such as a map, your map will not generate.
-
-The **server** is where you add custom, interactive charts and maps for each goal. The **UI** is where you specify the layout and text for those elements in your dashboard.
-
-&lt;br&gt;
-
-To prepare your OHI goal data for map or plot visualization, open a new script in the **dataprep** folder and name it something like `fis.R` or `fisheries.R`, depending on how explicit you want to be. I would stick with the acronyms OHI uses for the goals and sub-goals, but that's just me.
-
-To see how you would need to format your data table, check out sections [9](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#map) &amp; [10](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#chart).
-
-.footnote[Back to [Table of Contents](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#3)]
-
----
-
-## What are all these files and folders?!
-
-Hint: read the `README.md`.
-
----
-name: modules
-class: middle, center
-
-# The 3 Shiny Modules
-
----
-
-## Modules: Map, Chart, and Summary Statistics
-
-.pull-left[
-`map`
-&lt;br&gt;
-![](img/map.jpg)
-]
-
-.pull-right[
-`chart`
-&lt;br&gt;
-![](img/card.jpg)
-&lt;br&gt;
-
-`summary_stats`
-&lt;br&gt;
-![](img/summary_stats.jpg)
-]
-
----
-
-## My personal definition of a shiny module..
-
-It represents a collection of functions that can be **reused** to create the same type of shiny element over and over.
-
-&lt;br&gt;
-
-Each of the three shiny modules in the Global Dashboard has a 1) user interface function and a 2) server-side function:
-
-* **Summary Statistics Card**: `summary_stats_ui( )`, `summary_stats( )`
-* **Map Card**: `map_ui( )`, `card_map( )`
-* **Chart Card**: `card_ui( )`, `card_plot( )`
-
-You can find these in the **modules** folder. Each module has it's own R script, named aptly.
-
-You will see examples of the ui and server module elements in the next two sections.
+Note: `basename( )` takes the base file name of a file path. In this case, it's 'annual_catch_2003.tif'
+Context: Extract year from a file path (Catch raster) to find the corresponding year in another file path (NPP raster)
 
 
----
-name: ui
-class: middle, center
+```r
+file &lt;- "/home/shares/ohi/git-annex/globalprep/prs_fish/v2018/int/comm_landings/
+annual_catch_2003.tif"
 
-# Sneak Peak: User Interface
+&gt; basename(file)
+[1] "annual_catch_2003.tif"
 
----
+year &lt;- str_extract(basename(file),"(\\d)+") # extracts any digits
 
-## There's a lot in the UI
-
-but all the main components of each sidebar section will be specified inside `tabItems( )`
-
+npp_files_gf[str_detect(npp_files_gf, yr)]
+[1] "/home/shares/ohi/git-annex/globalprep/prs_fish/v2018/VGPM_primary_productivity
+/int/annual_npp/annual_mean_npp_moll_2003_gf.tif"
 ```
-tabItems(
- ## Home Page ##
-   tabItem(tabName = "dashboard", # unique identifier
-            frontp() # content is in front_page.R
-            )
+---
+name: start_end
 
- ## Mariculture ##
-    tabItem(tabName = "mar", # unique identifier
-          tab_title_ui(), # header UI function
-          summary_stats_ui(), # summary statistics UI module
-          map_ui(), # map UI module
-          card_ui() # plot UI module
-          )
-          
-)
+## Extract using start and end pattern
+
+Function: `str_detect`, RegEx: `^`, `.*`, `$`
+
+Note: the two lines of code below extract different strings in the column `RAM$stocklong`. The first doesn't require stock names to end in the string "Japan". The second one does. `.*` is an indicator for "any string".
+Context: Searching for species and region string patterns in a column describing fisheries stock in order to manually assign OHI and FAO region ids.
+
+
+```r
+RAM &lt;- read.csv("https://rawgit.com/OHI-Science/ohiprep_v2018/master/globalprep/fis/v2018/int/RAM_fao_ohi_rgns.csv")
+&gt; RAM[which(str_detect(RAM$stocklong, "^Walleye pollock.*Japan")),]
+     rgn_id fao_id                              assessid RAM_area_m2   stockid                              stocklong
+3552     NA     NA  FAFRFJ-APOLLNSJ-1970-2013-JPNIMP2016          NA  APOLLNSJ     Walleye pollock Sea of Japan North
+3553     NA     NA FAFRFJ-APOLLPJPN-1975-2013-JPNIMP2016          NA APOLLPJPN Walleye pollock Pacific Coast of Japan
+&gt; RAM[which(str_detect(RAM$stocklong, paste(c("^Walleye pollock.*Japan$"), collapse = "|"))),]
+     rgn_id fao_id                              assessid RAM_area_m2   stockid                              stocklong
+3553     NA     NA FAFRFJ-APOLLPJPN-1975-2013-JPNIMP2016          NA APOLLPJPN Walleye pollock Pacific Coast of Japan
+```
+---
+name: grep
+
+## Extract string with `grep`
+
+Search for the string "NY.GDP.PCAP.PP.KD" in data frame `indicators` which has a column named `indicator` and print rows that match that qualification.
+
+```r
+&gt; class(indicators)
+[1] "data.frame"
+names(indicators)
+[1] "indicator"          "name"               "description"        "sourceDatabase"     "sourceOrganization"
 ```
 
-.footnote[Back to [Table of Contents](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#3)]
----
-
-## Notes about UI
-
-* The UI only creates the layout, sets the text for the content, you'll need to define matching module functions in the server for the outputs to be created
-* You can create as many cards, maps, baseline metrics, and title sections as you want, but I tend to avoid cluttering the shiny dashboard, so you can direct the user's attention towards specific visuals without overwhelming them
-* The four different elements you just saw are created by 4 different modules. Each module has a ui function as well as a server function. Without both, you can't create the outputs you just saw in the previous slide
-
-
-
----
-name: server
-class: middle, center
-
-# Sneak Peak: Server
-
----
-
-## Server, Simplified
-
-This is the basic code that exists in the server that communicates with the ui to generate the plot, the summary statistics, and map.
-
-```
-function(input, output, session) {
-
-  callModule(card_plot, id),
-  callModule(summary_stats, id),
-  callModule(card_map, id)
-
-}
-
+```r
+&gt; indicators[grep("NY.GDP.PCAP.PP.KD", indicators$indicator), ] 
+                indicator                                                name
+4460    NY.GDP.PCAP.PP.KD GDP per capita, PPP (constant 2005 international $)
+4461 NY.GDP.PCAP.PP.KD.ZG               GDP per capita, PPP annual growth (%)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            description
+4460 GDP per capita based on purchasing power parity (PPP). PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP at purchaser's prices is the sum of gross value added by all resident producers in the economy plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2005 international dollars.
+4461                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+                    sourceDatabase                                     sourceOrganization
+4460  World Development Indicators World Bank, International Comparison Program database.
+4461 Africa Development Indicators     
 ```
 
 ---
-name: sidebar
-class: middle, center
+name: posit
 
-# Add New Goal Section to the Sidebar
+## Select string in a file path based on position
 
----
+Here's an example cluster of file paths
 
-## First add the sidebar tab name
-
-Function: `menuItem( )`
-
-Currently there are only two tabs: **The OHI Story** and **Mariculture**. To create a tab section in the side bar:
-
-* Go to **ui.R**
-* Locate `sidebarMenu( )` inside `dashboardSidebar( )`
-* Uncomment and edit the goal you want to add a `menuItem( )` for
-
-Arguments: Provide the name of the tab (e.g. **"Fisheries"**) and provide a unique ID in `tabName`. This must match the `tabName` in `tabItem( )` in the next section. I'd stick with the lower-case, OHI goal abbreviations.
-
+```r
+&gt; count
+[1] "/home/shares/ohi/git-annex/globalprep/cw_pressure_trash/v2015/globalplastic_wd_cd_rasters_180/count_density_size1_180.tif"
+[2] "/home/shares/ohi/git-annex/globalprep/cw_pressure_trash/v2015/globalplastic_wd_cd_rasters_180/count_density_size2_180.tif"
+[3] "/home/shares/ohi/git-annex/globalprep/cw_pressure_trash/v2015/globalplastic_wd_cd_rasters_180/count_density_size3_180.tif"
+[4] "/home/shares/ohi/git-annex/globalprep/cw_pressure_trash/v2015/globalplastic_wd_cd_rasters_180/count_density_size4_180.tif"
 ```
-  dashboardSidebar(
-    
-    sidebarMenu(
-       menuItem("The OHI Story", tabName = "dashboard", icon = icon("globe", lib="glyphicon")),
-       menuItem("Mariculture", tabName = "mar")
-      # menuItem("Tourism &amp; Recreation", tabName = "tr"),
-      # menuItem("Fisheries", tabName = "fis")
-      )
-  )
+Use base function `strsplit` to split up the file path into a list of the sections
+
+```r
+&gt; strsplit(count[1],'/','.')
+[[1]]
+ [1] ""                                "home"                            "shares"                         
+ [4] "ohi"                             "git-annex"                       "globalprep"                     
+ [7] "cw_pressure_trash"               "v2015"                           "globalplastic_wd_cd_rasters_180"
+[10] "count_density_size1_180.tif"
 ```
+I want the tenth string section (cont. on next slide)
 
-.footnote[Back to [Table of Contents](https://mazu.nceas.ucsb.edu/rstudio/files/github/global-dashboard/slidedeck/modules_slidedeck.html#3)]
-
----
-
-## Now add the page for the new section
-
-Function: `tabItem( )`
-
-* You should still be in **ui.R**
-* Go to the `tabItems( )` section
-* Create a new `tabItem( )` for your goal
-
-Arguments: The only thing you need to do is specify `tabName` with a unique ID (I would stick with the lower-case OHI abbreviations for each goal and sub-goal)
-
-```
-tabItems(
-
- ## Fisheries ##
-    tabItem(tabName = "fis"),
-    
- ## Mariculture ##
-    tabItem(tabName = "mar")
-
-)
-```
-
-
----
-name: header
-class: middle, center
-
-# Add Header Content
-
----
-
-## Don't need a module for this one
-
-Function: `tab_title_ui( )`
-
-* Go to **ui.R**, `tabItems( )`, then create a `tabItem( )` section
-* Type in your `goal_text`, which is just the goal name in caps
-* Type in the `goal_description`, a one-liner that draws people's interest
-* Type in the OHI `definition` for the goal and give a bit more context about how it's calculated. 
-
-```
-tabItems(
- ## Mariculture ##
-    tabItem(tabName = "mar",
-        
-          ## Mariculture Tab Title ##
-          tab_title_ui(goal_text = "MARICULTURE",
-                       goal_description = "Global mariculture has been growing impressively since the 1980s, while wild-caught fishery production has remained relatively static.",
-                       definition = list("Mariculture measures the ability to reach the highest levels of seafood gained from farm-raised facilities without damaging the ocean’s ability to provide fish sustainably now and in the future. You can make this as long as you want"))
-          )
-)
+```r
+&gt;  unlist(strsplit(count[1],'/','.'))[10]
+[1] "count_density_size1_180.tif"
 ```
 
 ---
-name: stats
-class: middle, center
 
-# Add Summary Statistics Module
+Can create a function/loop to grab the 10th string section in each of the file paths in a group of file paths.
 
----
+In this example, the function loops through each file to grab the string, reads the entire raster file, does some manipulation, then saves the raster in a new file using the string that was selected.
 
-## UI Module
+**Example**:
 
-Function: `summary_stats_ui( )`
+```r
+  unlog = function(file){
 
-For full description of argument, see **modules/summary_stats_card.R**
-
-* Go to **ui.R**, `tabItems( )`, `tabItem( )`
-* Set the `id`, the unique id for this summary statistics shiny element (Ex: "mar_stats", "fis_stats"). This must match the id for this module on the server side (see next slide)
-* Set the `number_boxes`, the number of summary statistics you want to display
-
-```
-tabItems(
- ## Mariculture ##
-    tabItem(tabName = "mar",
-    
-          ## Mariculture Baseline Metrics ##
-          summary_stats_ui(id = "mar_baseline",
-                               number_boxes = 3)
-          )
-)
-```
-
-
----
-
-## Server Module
-
-Function: `summary_stats( )`, `callModule( )`
-
-Change `statistic` and corresponding `text` for each iteration to allow for multiple flexibility. I used the **test/summary_stats.Rmd** script to wrangle and derive the statistics for Mariculture.
-
-```
-function(input, output, session) {
-
-## Mariculture Baseline Metrics ##
-  callModule(summary_stats, "mar_baseline",
-             number_boxes = 3,
-             statistic = list("19%", "68%", "51%"),
-             text = list("of global seafood comes from mariculture. Aquaculture, which includes marine and inland production, contributes 53% to all seafood provision.",
-                         "of mariculture produced in 2016 for human consumption came from China. They are followed by South Korea at only 4%!",
-                         "of mariculture is comprised of shellfish production by weight. The remaining 33% is from seaweed and 15% from fish."))
-
+  name = unlist(strsplit(file,'/','.'))[3] #split filename, grab second string to use in naming tif
+  r = raster(file)
+  out = 10^r
+  
+  writeRaster(out,filename=paste0(data_wd,'v2015/tmp/unlog/unlog_',name,sep=''),overwrite=T,format='GTiff')
+  
 }
 ```
 
 ---
-name: map
-class: middle, center
+name: year
 
-# Add a Global Map!
+## Select files in a list of files matching a given year
 
----
 
-## UI Module
+```r
+data_files &lt;- list.files(file.path(path_data, "annual_catch"), full.names = T) # 132 files
 
-Function: `map_ui( )`
-
-For full description of arguments see **modules/map_card.R**.
-
-* `id` is a unique ID that must match the `id` in the server side of the map code
-* `select_type` options are **radio** buttons, a **drop_down** menu, or **select** buttons (you need to have " " around the select type)
-* `select_location` options are **above** or **below**
-* `select_choices` is a vector of the categories in the column **type**
-* `source_text` is to list the source of the data
-
+yr = 2015
+yr &lt;- as.character(yr)
+## Select all catch data files with "2015" in the file name
+datanames &lt;- data_files[which(str_detect(data_files, yr))]
 ```
-## Mariculture Global Map
-          map_ui(id = "mar_global_map",
-                 title_text = paste0("Global Map of Mariculture Production in ", data_yr),
-                 sub_title_text = "Start exploring! Select different data to view on the map &amp; click on EEZ regions to see country and values (may take a few seconds to load).",
-                 select_type = "radio",
-                 select_location = "above",
-                 select_choices = c("All Production" = "prodTonnesAll",
-                                    "Production per Capita" = "prodPerCap"),
-                 select_label = "",
-                 source_text = list(
-                   p("Sources:"),
-                   p(tags$sup("1."), tags$a(href="http://www.fao.org/fishery/statistics/software/fishstatj/en", "Food and Agriculture Organization"), ", Global Aquaculture Production Quantity (March 2018)"),
-                   p(tags$sup("2."), tags$a(href="http://sedac.ciesin.columbia.edu/data/collection/gpw-v4/documentation","Center for International Earth Science Information Network"), ", Gridded Population of the World, V4 (2016).")
-                   )
-                 )
+voila
+
+```r
+&gt; datanames
+[1] "/home/shares/ohi/git-annex/globalprep/prs_fish/v2018/int/annual_catch/CatchInd_2015.rds" 
+[2] "/home/shares/ohi/git-annex/globalprep/prs_fish/v2018/int/annual_catch/CatchNInd_2015.rds"
+```
+Now I can manipulate and combine them
+
+```r
+## read in the two data tables
+  list_data &lt;- map(datanames, readRDS)
+  ## combine the two data tables in your list
+  combined &lt;- bind_rows(list_data)
+  ## save to fis folder in mazu
+  saveRDS(combined, paste0(fis_path, "annual_catch/", sprintf("Catch_%s.rds",yr)))
 ```
 
 ---
+name: start_with
 
-## Server Module
+## Extracting string using `starts_with`
 
-Function: `card_map( )`, `callModule( )`
+Function: `dplyr::starts_with`
 
-The global map module can take multiple types of data to plot as long as the data table is set up right. Make sure you have a column called **type** that lists the categories of data you want to plot. See how the `mar_global_map` was created in **dataprep/mar.R**.
+Data table
 
+```r
+&gt; head(data)
+  rgn_id  avg3yr_2007 avg3yr_2008  avg3yr_2009 avg3yr_2010 avg3yr_2011 avg3yr_2012
+1     21    92.666667   102.00000   103.000000    110.6667   104.66667    110.3333
+2     69    45.000000    42.66667    39.000000     42.0000    51.33333     51.0000
+3     70   102.000000    85.66667    74.666667     91.0000   115.00000    119.0000
+4     73 14749.000000 14465.66667 14502.666667  14629.3333 14770.33333  15059.6667
+5    143   262.000000   183.00000   133.666667    130.6667   132.00000    146.0000
+6    144     3.333333     0.00000     3.333333      5.0000     5.00000      4.0000
+  avg3yr_2013 avg3yr_2014 avg3yr_2015 avg3yr_2016 avg3yr_2017
+1    113.3333   115.33333   114.66667   116.00000   119.00000
+2     49.0000    44.00000    42.33333    42.33333    37.66667
+3    112.3333   100.66667    91.00000    75.66667    74.33333
+4  14730.0000 14892.00000 13994.66667 14357.00000 14145.66667
+5    111.0000    82.33333    79.66667    67.00000    70.00000
+6     17.0000    17.00000    14.66667     0.00000     4.00000
+  Reference_avg1979to2000monthlypixels pctdevR_2007 pctdevR_2008 pctdevR_2009 pctdevR_2010
+1                            101.77273  0.910525532    1.0022331  1.012058955   1.08739020
+2                             61.09091  0.736607143    0.6984127  0.638392857   0.68750000
+3                            108.09091  0.943650126    0.7925428  0.690776563   0.84188394
+4                          13281.95455  1.110454034    1.0891218  1.091907567   1.10144432
+5                            332.86364  0.787109108    0.5497747  0.401565843   0.39255314
+6                            355.68182  0.009371672    0.0000000  0.009371672   0.01405751
 ```
-## Mariculture Global Map ##
-  callModule(card_map, "mar_global_map",
-             data = mar_global_map,
-             field = "input",
-             filter_field = type, # type of data to plot
-             display_field = "map_data",
-             display_units = "units",
-             color_palette = ygb,
-             legend_title = "Legend",
-             popup_title = "country")
+
+```r
+## health data
+health &lt;- data %&gt;%
+  dplyr::filter(rgn_typ == "eez") %&gt;%
+  dplyr::select(rgn_id, habitat, dplyr::starts_with("pctdevR")) %&gt;%
+  tidyr::gather("year", "health", -(1:2)) %&gt;%
+  dplyr::mutate(year = substring(year, 9, 12)) %&gt;%
+  dplyr::mutate(year = as.numeric(year)) %&gt;%
+  dplyr::mutate(health = ifelse(health &gt; 1, 1, health))
 ```
 
 
 ---
+name: column_name
 
-## Set-up of the data table
+## Remove string from column names
 
-The wrangling of the mariculture data was done in **dataprep/mar.R**. Create a new script for each new goal. 
+Remove the suffix "_name" from multiple columns in `data`
 
-Test `leaflet` map code in **test/test_global_map.Rmd**.
+Example 1:
 
-```
-&gt; head(mar_global_map, 15)
-# A tibble: 15 x 6
-   rgn_id country           type     map_data units Taxon    
-    &lt;dbl&gt; &lt;chr&gt;             &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt; &lt;fct&gt;    
- 1   82.0 Albania           prodTon…    700   tonn… Fish     
- 2   82.0 Albania           prodTon…    700   tonn… Crustace…
- 3   82.0 Albania           prodTon…    700   tonn… Bivalve …
- 4   84.0 Algeria           prodTon…    364   tonn… Crustace…
- 5   84.0 Algeria           prodTon…    364   tonn… Fish     
- 6   84.0 Algeria           prodTon…    364   tonn… Bivalve …
- 7  151   American Samoa    prodTon…     NA   tonn… NA       
- 8   92.0 Amsterdam Island… prodTon…     NA   tonn… NA       
- 9   26.0 Andaman and Nico… prodTon…     NA   tonn… NA       
-10  200   Angola            prodTon…     NA   tonn… NA       
-11  118   Anguilla          prodTon…     NA   tonn… NA       
-12  120   Antigua and Barb… prodTon…     NA   tonn… NA       
-13  172   Argentina         prodTon…     16.2 tonn… Bivalve …
-14  250   Aruba             prodTon…     NA   tonn… Bivalve …
-15   85.0 Ascension         prodTon…     NA   tonn… NA  
+```r
+comname                          sciname               ico_gl ico_rgn_id
+ &lt;chr&gt;                            &lt;chr&gt;                 &lt;lgl&gt;       &lt;int&gt;
+1 Blue Shark                       Prionace glauca       T              NA
+2 Whale Shark                      Rhincodon typus       T              NA
+3 Shortfin Mako                    Isurus oxyrinchus     T              NA
+4 Olive Ridley Turtle              Lepidochelys olivacea T              NA
+5 Irrawaddy Dolphin                Orcaella brevirostris T              NA
+6 Humphead wrasse, Napoleon Wrasse Cheilinus undulatus   T              NA
 ```
 
----
-name:chart
-class: middle, center
-
-# Add a Plot
-
----
-
-## UI Module
-
-Function: `card_ui( )`
-
-For full description of argument definitions, see **modules/chart_card.R**.
-
-* `select_type` options are **radio**, **drop_down**, **select**, or **search**
-* `select_location` options are **below** or **above**
-* `select_choices` is a vector of values that you want the user to be able to selet from (e.g. list of countries)
-
+```r
+data &lt;- data %&gt;%
+    setNames(names(.) %&gt;%
+               str_replace('name', ''))
 ```
-card_ui(id = "mar_prod",
-        title_text = "Tonnes of Species Harvested by Country",
-        sub_title_text = "Start exploring! Select or type in a country of interest. Click on names of species you want to remove from the plot. Hover over the points to view tonnes and species harvested.",
-        select_type = "search",
-        select_location = "above",
-        select_choices = unique(mar_harvest$country),
-        select_label = NULL,
-        source_text = list(
-                      p("Sources:"),
-                      p(tags$sup("1."), tags$a(href="http://www.fao.org/fishery/statistics/software/fishstatj/en", "Food and Agriculture Organization"), ", Global Aquaculture Production Quantity (March 2018)"))
-                     )
-```
----
+Example 2:
 
-## Server Module
-
-Function: `card_plot( )`, `callModule( )`
-This is the module that creates plots. The current options for plots include: bar graph, line graph, or scatterplot. This can be customized in the **modules** folder.
-
-* `df` is the name of the wrangled data table
-* `filter_field` is the column that gets filtered when the user is selecting different options. Should match with `select_choices`
-* `colors` is a set color palette defined in **global.R**
-
-For a **bar chart**, set `plot_type` to **"bar"**, for a **line graph**, set `mode` to **"lines+markers"**, and for a **scatter**, set `mode` to **"markers"**
-
-```
-## Mariculture Production ##
-  callModule(card_plot, "mar_prod",
-             df = mar_harvest,
-             x = "year",
-             y = "tonnes",
-             color_group = "species",
-             filter_field = "country",
-             colors = cols,
-             plot_type = "scatter",
-             mode = "lines+markers",
-             tooltip_text = ~paste("Tonnes:", tonnes,
-                                   "&lt;br&gt;Species:", species, sep=" "),
-             xaxis_label = "Year",
-             yaxis_label = "Annual Production (tonnes)")
+```r
+lsp_new_old &lt;- status_3nm_new %&gt;%
+  full_join(status_3nm_old, by = c('rgn_id')) %&gt;%
+  full_join(status_1km_new, by = c('rgn_id')) %&gt;%
+  full_join(status_1km_old, by = c('rgn_id')) %&gt;%
+  mutate(status_old = (status_3nm_old + status_1km_old) / 2,
+         status_new = (status_3nm_new + status_1km_new) / 2) %&gt;%
+  gather(rgn, score_new, contains('new')) %&gt;%
+  gather(rgn_old, score_old, contains('old')) %&gt;% 
+  mutate(rgn = str_replace(rgn, '_new', ''),
+         rgn_old = str_replace(rgn_old, '_old', ''),
+         score_new = round(score_new, 3),
+         score_old = round(score_old, 3))
 ```
 
 ---
+name: ifelse
 
-## Set-up of data table
+## Manipulate `ifelse` and strings
 
-Check out how `mar_harvest` was set up in **dataprep/mar.R**. 
 
+**Example 1**: Mutate column with `ifelse`, `str_detect`, and `toupper`. Create column `cat` based on specifications or matches in `cat_txt`
+
+
+```r
+ico_assess &lt;- ico_assess_raw %&gt;%
+  rename(cat = code, cat_txt = category) %&gt;%
+  mutate(cat = toupper(cat),
+         cat = str_replace(cat, 'LR/', ''),
+         cat = ifelse(cat %in% c('K', 'I'), 'DD', cat),
+         cat = ifelse(cat == 'NR', 'NE', cat),
+         cat = ifelse(str_detect(toupper(cat_txt), 'VERY RARE'), 'CR', cat),
+         cat = ifelse(str_detect(toupper(cat_txt), 'LESS RARE'), 'T', cat),
+         cat = ifelse(str_detect(toupper(cat_txt), 'STATUS INADEQUATELY KNOWN'), 'DD', cat),
+         cat = ifelse(cat == 'V', 'VU', cat), 
+         cat = ifelse(cat == 'E', 'EN', cat))
 ```
-&gt; head(mar_harvest,15)
-   rgn_id country           species Taxon_code year tonnes Taxon
-1      82 Albania  European seabass          F 2006   87.0  Fish
-2      82 Albania  European seabass          F 2007   84.0  Fish
-3      82 Albania  European seabass          F 2008  142.0  Fish
-4      82 Albania  European seabass          F 2009  135.0  Fish
-5      82 Albania  European seabass          F 2010  135.0  Fish
-6      82 Albania  European seabass          F 2011  170.0  Fish
-7      82 Albania  European seabass          F 2012  170.0  Fish
-8      82 Albania  European seabass          F 2013  170.0  Fish
-9      82 Albania  European seabass          F 2014  129.4  Fish
-10     82 Albania  European seabass          F 2015  392.0  Fish
-11     82 Albania  European seabass          F 2016  200.0  Fish
-12     82 Albania Gilthead seabream          F 2001  100.0  Fish
-13     82 Albania Gilthead seabream          F 2002  200.0  Fish
-14     82 Albania Gilthead seabream          F 2003  250.0  Fish
-15     82 Albania Gilthead seabream          F 2004  400.0  Fish
+
+**Example 2**: Manipulating `ifelse` and strings to `write.csv`
+
+```r
+if(sum(str_detect(names(mar_sp), "exclude$"))==1) {
+ write.csv(maric, 'output/MAR_FP_data.csv', row.names=FALSE)
+ } else if (sum(str_detect(names(mar_sp), "exclude_no_seaweed"))==1) {
+   write.csv(maric, 'test/MAR_FP_data_no_seaweed.csv', row.names=FALSE)
+   } else if (sum(str_detect(names(mar_sp), "exclude_no_nei"))==1) {
+     write.csv(maric, 'test/MAR_FP_data_no_nei.csv', row.names=FALSE)
+     }
+```
+
+---
+name: condition
+
+## Conditional Selection Based on String in File Name
+
+
+Here's my file
+
+```r
+f
+[1] "/home/shares/ohi/git-annex/globalprep/_raw_data/FAO_commodities/d2018/FAO_raw_commodities_quant_1976_2015.csv"
+```
+
+Search for string `quant` or `value`
+
+```r
+&gt; str_detect(f, c('quant','value'))
+[1]  TRUE FALSE
+&gt; c('tonnes','usd')
+[1] "tonnes" "usd"  
+```
+
+Save the appropriate units to a variable for use later
+
+```r
+units &lt;- c('tonnes','usd')[str_detect(f, c('quant','value'))]
+
+&gt; c('tonnes','usd')[str_detect(f, c('quant','value'))]
+[1] "tonnes"
+```
+
+---
+name: symbols
+
+## Removing weird symbols in species names
+
+Example data table
+
+```r
+&gt; head(mar_out)
+  rgn_id     species                      fao environment year value Taxon_code gap_0_fill species_code
+1      5 Blue shrimp Pacific, Western Central      Marine 1983    16         SH          0            1
+2      5 Blue shrimp Pacific, Western Central      Marine 1984    51         SH          0            1
+3      5 Blue shrimp Pacific, Western Central      Marine 1985    87         SH          0            1
+4      5 Blue shrimp Pacific, Western Central      Marine 1986    59         SH          0            1
+5      5 Blue shrimp Pacific, Western Central      Marine 1987    87         SH          0            1
+6      5 Blue shrimp Pacific, Western Central      Marine 1988   217         SH          0            1
+```
+Some of the species names have weird symbols: `Barramundi(=Giant seaperch)`
+
+Filter for values with that "(=...)" symbol and remove the string inside the parenthesis. The `\\` escapes symbols in strings so it knows you want a literal symbol not a regex expression. For example ".*" is a regex expression, but if you wanted to search for a literal ".*" you would probably add "\\.\\*".
+
+```r
+&gt; test &lt;- mar_out[which(str_detect(mar_out$species, "(=.*)")),]
+&gt;  a &lt;- unique(test$species)
+&gt; a
+[1] Barramundi(=Giant seaperch)   Chinook(=Spring=King) salmon 
+[3] Coho(=Silver) salmon          Northern quahog(=Hard clam)  
+[5] Snooks(=Robalos) nei          Blackspot(=red) seabream     
+[7] Silversides(=Sand smelts) nei
+&gt; str_replace(a, "\\(\\=.*\\)","")
+[1] "Barramundi"         "Chinook salmon"     "Coho salmon"       
+[4] "Northern quahog"    "Snooks nei"         "Blackspot seabream"
+[7] "Silversides nei"   
 ```
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
