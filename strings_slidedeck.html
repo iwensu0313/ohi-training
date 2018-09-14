@@ -3,8 +3,7 @@
   <head>
     <title>OHI String Applications</title>
     <meta charset="utf-8">
-    <meta name="author" content="du.iwensu@gmail.com" />
-    <meta name="date" content="2018-01-01" />
+    <meta name="author" content="iwensu0313" />
     <link href="libs/remark-css/hygge.css" rel="stylesheet" />
     <link href="libs/remark-css/rladies-fonts.css" rel="stylesheet" />
   </head>
@@ -13,8 +12,8 @@
 class: center, middle, inverse, title-slide
 
 # OHI String Applications
-### <a href="mailto:du.iwensu@gmail.com">du.iwensu@gmail.com</a>
-### 2018
+### iwensu0313
+### 09-14-2018
 
 ---
 
@@ -60,6 +59,8 @@ npp_files_gf[str_detect(npp_files_gf, yr)]
 [1] "/home/shares/ohi/git-annex/globalprep/prs_fish/v2018/VGPM_primary_productivity
 /int/annual_npp/annual_mean_npp_moll_2003_gf.tif"
 ```
+
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 name: start_end
 
@@ -81,6 +82,7 @@ RAM &lt;- read.csv("https://rawgit.com/OHI-Science/ohiprep_v2018/master/globalpr
      rgn_id fao_id                              assessid RAM_area_m2   stockid                              stocklong
 3553     NA     NA FAFRFJ-APOLLPJPN-1975-2013-JPNIMP2016          NA APOLLPJPN Walleye pollock Pacific Coast of Japan
 ```
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 name: grep
 
@@ -107,7 +109,7 @@ names(indicators)
 4460  World Development Indicators World Bank, International Comparison Program database.
 4461 Africa Development Indicators     
 ```
-
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 name: posit
 
@@ -138,7 +140,7 @@ I want the tenth string section (cont. on next slide)
 &gt;  unlist(strsplit(count[1],'/','.'))[10]
 [1] "count_density_size1_180.tif"
 ```
-
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 
 Can create a function/loop to grab the 10th string section in each of the file paths in a group of file paths.
@@ -158,7 +160,7 @@ In this example, the function loops through each file to grab the string, reads 
   
 }
 ```
-
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 name: year
 
@@ -190,7 +192,7 @@ Now I can manipulate and combine them
   ## save to fis folder in mazu
   saveRDS(combined, paste0(fis_path, "annual_catch/", sprintf("Catch_%s.rds",yr)))
 ```
-
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 name: start_with
 
@@ -225,6 +227,9 @@ Data table
 6                            355.68182  0.009371672    0.0000000  0.009371672   0.01405751
 ```
 
+---
+
+
 ```r
 ## health data
 health &lt;- data %&gt;%
@@ -236,7 +241,7 @@ health &lt;- data %&gt;%
   dplyr::mutate(health = ifelse(health &gt; 1, 1, health))
 ```
 
-
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 name: column_name
 
@@ -262,6 +267,9 @@ data &lt;- data %&gt;%
     setNames(names(.) %&gt;%
                str_replace('name', ''))
 ```
+
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
+---
 Example 2:
 
 ```r
@@ -278,7 +286,7 @@ lsp_new_old &lt;- status_3nm_new %&gt;%
          score_new = round(score_new, 3),
          score_old = round(score_old, 3))
 ```
-
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 name: ifelse
 
@@ -301,7 +309,8 @@ ico_assess &lt;- ico_assess_raw %&gt;%
          cat = ifelse(cat == 'V', 'VU', cat), 
          cat = ifelse(cat == 'E', 'EN', cat))
 ```
-
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
+---
 **Example 2**: Manipulating `ifelse` and strings to `write.csv`
 
 ```r
@@ -313,7 +322,7 @@ if(sum(str_detect(names(mar_sp), "exclude$"))==1) {
      write.csv(maric, 'test/MAR_FP_data_no_nei.csv', row.names=FALSE)
      }
 ```
-
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 name: condition
 
@@ -344,7 +353,7 @@ units &lt;- c('tonnes','usd')[str_detect(f, c('quant','value'))]
 &gt; c('tonnes','usd')[str_detect(f, c('quant','value'))]
 [1] "tonnes"
 ```
-
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
 ---
 name: symbols
 
@@ -364,6 +373,8 @@ Example data table
 ```
 Some of the species names have weird symbols: `Barramundi(=Giant seaperch)`
 
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
+---
 Filter for values with that "(=...)" symbol and remove the string inside the parenthesis. The `\\` escapes symbols in strings so it knows you want a literal symbol not a regex expression. For example ".*" is a regex expression, but if you wanted to search for a literal ".*" you would probably add "\\.\\*".
 
 ```r
@@ -379,6 +390,7 @@ Filter for values with that "(=...)" symbol and remove the string inside the par
 [4] "Northern quahog"    "Snooks nei"         "Blackspot seabream"
 [7] "Silversides nei"   
 ```
+.footnote[Back to [Table of Contents](https://rawgit.com/iwensu0313/ohi-training/master/strings_slidedeck.html#2)]
     </textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
